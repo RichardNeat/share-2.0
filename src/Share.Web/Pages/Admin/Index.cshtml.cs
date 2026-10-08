@@ -18,6 +18,18 @@ public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder
     public List<IngestRun> Runs { get; private set; } = [];
     public DemoUser SignedInAs => currentUser.User;
 
+    public bool BlueBackground
+    {
+        get => HttpContext.Session.GetString("blueBackground") == "true";
+        set => HttpContext.Session.SetString("blueBackground", value.ToString().ToLower());
+    }
+
+    public bool IsFlipped
+    {
+        get => HttpContext.Session.GetString("isFlipped") == "true";
+        set => HttpContext.Session.SetString("isFlipped", value.ToString().ToLower());
+    }
+
     public async Task OnGetAsync()
     {
         Files = files.All();
@@ -67,6 +79,20 @@ public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder
     {
         await seeder.ResetAsync();
         Message = "Demo reset to empty";
+        return RedirectToPage();
+    }
+
+    public IActionResult OnPostToggleBlueBackground()
+    {
+        BlueBackground = !BlueBackground;
+        Message = $"Blue background {(BlueBackground ? "enabled" : "disabled")}";
+        return RedirectToPage();
+    }
+
+    public IActionResult OnPostToggleFlip()
+    {
+        IsFlipped = !IsFlipped;
+        Message = $"Page flip {(IsFlipped ? "enabled" : "disabled")}";
         return RedirectToPage();
     }
 }

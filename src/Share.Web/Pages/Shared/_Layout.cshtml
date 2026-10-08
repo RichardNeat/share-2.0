@@ -3,9 +3,8 @@
     var signedInAs = CurrentUser.User;
     var path = Context.Request.Path.Value ?? "/";
     bool Active(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-    var random = new Random();
-    var hasBlueBackground = random.Next(10) == 0;
-    var isFlipped = random.Next(20) == 0;
+    var hasBlueBackground = Context.Session.GetString("blueBackground") == "true";
+    var isFlipped = Context.Session.GetString("isFlipped") == "true";
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">

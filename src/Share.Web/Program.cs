@@ -8,6 +8,7 @@ using Share.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -61,6 +62,7 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/NotFound");
 
+app.UseSession();
 app.UseRouting();
 app.UseAuthorization();
 app.MapStaticAssets();

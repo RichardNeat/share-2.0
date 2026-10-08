@@ -67,6 +67,21 @@
     <button type="submit" class="govuk-button govuk-button--warning">Reset to empty</button>
 </form>
 
+<h2 class="govuk-heading-m">Demo effects</h2>
+<p class="govuk-body">Toggle these effects for the demo:</p>
+<div class="govuk-button-group">
+    <form method="post" asp-page-handler="ToggleBlueBackground" style="display: inline;">
+        <button type="submit" class="govuk-button app-shimmer-button @(Model.BlueBackground ? "app-shimmer-button--active" : "")">
+            @(Model.BlueBackground ? "✓ Blue background" : "Blue background")
+        </button>
+    </form>
+    <form method="post" asp-page-handler="ToggleFlip" style="display: inline;">
+        <button type="submit" class="govuk-button app-shimmer-button @(Model.IsFlipped ? "app-shimmer-button--active" : "")">
+            @(Model.IsFlipped ? "✓ Page flipped" : "Page flip")
+        </button>
+    </form>
+</div>
+
 <h2 class="govuk-heading-m">Service administration</h2>
 <ul class="govuk-list govuk-list--bullet">
     <li><a href="/Admin/Announcements" class="govuk-link">Manage announcements</a></li>
