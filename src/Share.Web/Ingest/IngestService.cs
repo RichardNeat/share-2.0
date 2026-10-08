@@ -32,6 +32,8 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
 
         if (file.Name.EndsWith("-visa-applications.json"))
             await IngestApplicationsAsync(run, await File.ReadAllTextAsync(file.Path));
+        else if (file.Name.EndsWith("-arrivals.csv"))
+            await IngestArrivalsAsync(run, await File.ReadAllTextAsync(file.Path));
         else
             throw new NotSupportedException($"{file.Name} is not a file type we can process yet");
 
@@ -129,6 +131,103 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
                         ? $"New case for {app.Lead?.FullName}"
                         : $"New case for {app.Accommodation.Address}",
                     Case = @case,
+                });
+            }
+        }
+    }
+
+    // Arrivals and decisions: match each row to an application by GWF first, UAN as fallback,
+    // then re-derive the application's visa status from all its updates. Unmatched rows are skipped.
+    // Idempotent: a row already stored for this file is counted, not applied twice.
+    async Task IngestArrivalsAsync(IngestRun run, string csv)
+    {
+        var rows = ArrivalsParser.Parse(csv);
+        run.RecordsInFile = rows.Count;
+        run.Added = 0;
+        run.AlreadyPresent = 0;
+        run.StatusesChanged = 0;
+        run.Arrivals = 0;
+        run.SkippedRows.Clear();
+
+        var apps = await db.VisaApplications.IgnoreQueryFilters()
+            .Include(a => a.Guests).Include(a => a.DecisionUpdates)
+            .ToListAsync();
+        var byGwf = new Dictionary<string, VisaApplication>(StringComparer.OrdinalIgnoreCase);
+        foreach (var a in apps)
+            foreach (var gwf in a.Guests.Select(g => g.Gwf).Append(a.Gwf).Where(g => !string.IsNullOrWhiteSpace(g)).Distinct())
+                byGwf.TryAdd(gwf!, a);
+        var byUan = apps.GroupBy(a => a.Uan, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+        var alreadyStored = run.Id == 0 ? [] : (await db.DecisionUpdates.IgnoreQueryFilters()
+            .Where(u => u.IngestRunId == run.Id).Select(u => u.RowNumber).ToListAsync()).ToHashSet();
+
+        foreach (var row in rows)
+        {
+            var reference = string.Join(" / ", new[] { row.Gwf, row.Uan }.Where(x => x != null));
+            if (row.Problem is not null)
+            {
+                run.SkippedRows.Add(new SkippedRow { RowNumber = row.RowNumber, Reference = reference, Reason = row.Problem });
+                continue;
+            }
+            if (row.Gwf is null && row.Uan is null)
+            {
+                run.SkippedRows.Add(new SkippedRow { RowNumber = row.RowNumber, Reference = null, Reason = "No GWF or UAN to match on" });
+                continue;
+            }
+            var app = row.Gwf is not null && byGwf.TryGetValue(row.Gwf, out var byG) ? byG
+                : row.Uan is not null && byUan.TryGetValue(row.Uan, out var byU) ? byU
+                : null;
+            if (app is null)
+            {
+                run.SkippedRows.Add(new SkippedRow { RowNumber = row.RowNumber, Reference = reference, Reason = "No application matches this GWF or UAN" });
+                continue;
+            }
+            if (alreadyStored.Contains(row.RowNumber))
+            {
+                run.AlreadyPresent++;
+                continue;
+            }
+
+            var hadArrived = app.DecisionUpdates.Any(u => u.ArrivedAt != null);
+            var before = app.Status;
+            var update = new DecisionUpdate
+            {
+                VisaApplication = app, IngestRun = run, RowNumber = row.RowNumber, Gwf = row.Gwf, Uan = row.Uan,
+                DecisionDate = row.DecisionDate, Decision = row.Decision, VoyageCode = row.VoyageCode,
+                ArrivalPort = row.ArrivalPort, ArrivedAt = row.ArrivedAtUtc, PersonIdentifier = row.PersonIdentifier,
+            };
+            app.DecisionUpdates.Add(update);
+            run.Added++;
+
+            app.Status = VisaStatusRules.Derive(app.DecisionUpdates.Select(u => VisaStatusRules.FromUpdate(u.Decision, u.ArrivedAt)));
+            var name = app.Lead?.FullName ?? app.Uan;
+            var when = row.ArrivedAtUtc ?? row.DecisionDate?.ToDateTime(TimeOnly.MinValue) ?? clock.GetUtcNow().UtcDateTime;
+            if (app.Status != before)
+            {
+                run.StatusesChanged++;
+                run.Events.Add(new TimelineEvent
+                {
+                    Kind = TimelineEventKind.VisaStatusChanged,
+                    OccurredAt = when,
+                    Title = "Visa status changed",
+                    Description = $"{name}'s visa application ({app.Uan}): {Display.VisaStatusTag(before).Text} to {Display.VisaStatusTag(app.Status).Text}"
+                        + (row.Decision is null ? "" : $". Home Office decision: {row.Decision}" + (row.DecisionDate is { } d ? $" on {Display.Date(d)}" : "")),
+                    VisaApplication = app,
+                    CaseId = app.CaseId,
+                });
+            }
+            if (row.ArrivedAtUtc is { } arrivedAt && !hadArrived && app.Status == VisaStatus.Arrived)
+            {
+                run.Arrivals++;
+                var others = app.Guests.Count - 1;
+                run.Events.Add(new TimelineEvent
+                {
+                    Kind = TimelineEventKind.GuestsArrived,
+                    OccurredAt = arrivedAt,
+                    Title = "Guests arrived in the UK",
+                    Description = $"{name}{(others > 0 ? $" and {others} family member{(others == 1 ? "" : "s")}" : "")} arrived at {Ports.Name(row.ArrivalPort)}"
+                        + (row.VoyageCode is null ? "" : $" on {row.VoyageCode}") + ". Check 4 can now be completed",
+                    VisaApplication = app,
+                    CaseId = app.CaseId,
                 });
             }
         }

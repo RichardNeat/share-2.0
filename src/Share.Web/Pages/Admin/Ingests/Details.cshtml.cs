@@ -19,8 +19,7 @@ public class DetailsModel(AppDbContext db, CurrentUser currentUser) : PageModel
         var run = await db.IngestRuns.Include(r => r.SkippedRows).FirstOrDefaultAsync(r => r.Id == id);
         if (run is null) return NotFound();
         Run = run;
-        Events = await db.TimelineEvents.Where(e => e.IngestRunId == id)
-            .OrderBy(e => e.OccurredAt).ThenBy(e => e.Id).ToListAsync();
+        Events = (await db.TimelineEvents.Where(e => e.IngestRunId == id).ToListAsync()).OldestFirst().ToList();
         return Page();
     }
 }

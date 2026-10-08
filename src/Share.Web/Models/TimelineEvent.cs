@@ -7,6 +7,28 @@ public enum TimelineEventKind
     CheckUpdated,
     CaseStatusChanged,
     GuestsArrived,
+    VisaStatusChanged,
+}
+
+public static class TimelineOrder
+{
+    // Events that share a timestamp are shown in the order they logically happen.
+    public static int Rank(TimelineEventKind kind) => kind switch
+    {
+        TimelineEventKind.ApplicationReceived => 0,
+        TimelineEventKind.CaseFormed => 1,
+        TimelineEventKind.VisaStatusChanged => 2,
+        TimelineEventKind.GuestsArrived => 3,
+        TimelineEventKind.CheckUpdated => 4,
+        TimelineEventKind.CaseStatusChanged => 5,
+        _ => 6,
+    };
+
+    public static IEnumerable<TimelineEvent> NewestFirst(this IEnumerable<TimelineEvent> events) =>
+        events.OrderByDescending(e => e.OccurredAt).ThenByDescending(e => Rank(e.Kind)).ThenByDescending(e => e.Id);
+
+    public static IEnumerable<TimelineEvent> OldestFirst(this IEnumerable<TimelineEvent> events) =>
+        events.OrderBy(e => e.OccurredAt).ThenBy(e => Rank(e.Kind)).ThenBy(e => e.Id);
 }
 
 // One log of meaningful changes. Feeds the ingest summary now and the case timeline (M5).

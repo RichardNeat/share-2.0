@@ -18,6 +18,10 @@
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Passport number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.PassportNumber)</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">GWF number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.Gwf ?? (g.IsLead ? null : app.Gwf is null ? null : $"{app.Gwf} (lead applicant's)"))</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa status</dt><dd class="govuk-summary-list__value"><partial name="_VisaStatusTag" model="app.Status" /></dd></div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Arrived in the UK</dt>
+        <dd class="govuk-summary-list__value">@(app.LatestArrival is { } arr ? $"{Display.DateTime(arr.ArrivedAt!.Value)} at {Ports.Name(arr.ArrivalPort)}{(arr.VoyageCode is null ? "" : $" on {arr.VoyageCode}")}" : "Not yet")</dd>
+    </div>
 </dl>
 
 <h2 class="govuk-heading-m">Linked records</h2>

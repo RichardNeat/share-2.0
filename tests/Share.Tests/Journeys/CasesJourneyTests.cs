@@ -69,7 +69,7 @@ public class CasesJourneyTests : IClassFixture<AppFactory>
         Assert.Equal("Exeter", Text(Row(detail, "Council").QuerySelector("dd")));
         Assert.Contains("Sofia Melnyk, aged 10", Text(Row(detail, "Youngest guest").QuerySelector("dd")).Replace("\n", " "));
         Assert.Equal(["Kateryna Melnyk", "Andriy Melnyk", "Sofia Melnyk"], detail.QuerySelectorAll("table tbody tr td:first-child a").Select(Text));
-        Assert.Single(detail.QuerySelectorAll("main a[href^='/Applications/']"));
+        Assert.Single(detail.QuerySelectorAll("main a[href^='/Applications/']").Select(a => a.GetAttribute("href")).Distinct());
     }
 
     [Fact]

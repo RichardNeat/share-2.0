@@ -30,7 +30,7 @@
 
 /* Tags in tables: no width cap, so the column sizes to fit them; they wrap only if space runs out.
    Stacked tags get a small gap. */
-.govuk-table .govuk-tag { max-width: none; margin-bottom: 5px; }
+.govuk-table .govuk-tag, .govuk-summary-list .govuk-tag { max-width: none; margin-bottom: 5px; }
 
 /* Secondary detail under a link in a table cell (GOV.UK secondary text colour) */
 .app-secondary-text { display: block; color: #505a5f; font-size: 1rem; line-height: 1.25; margin-top: 5px; }
@@ -93,3 +93,11 @@
 .app-tile__count { margin-bottom: 5px; }
 .app-tile__number { font-weight: 700; font-size: 1.5rem; }
 .app-tile__description { color: #505a5f; margin-bottom: 0; }
+
+/* Case timeline (shape of the MOJ timeline pattern) */
+.app-timeline { list-style: none; margin: 0 0 30px; padding: 0; border-left: 5px solid #1d70b8; }
+.app-timeline__item { position: relative; padding: 0 0 20px 20px; }
+.app-timeline__item::before { content: ""; position: absolute; left: -12px; top: 4px; width: 9px; height: 9px; border: 5px solid #1d70b8; border-radius: 50%; background: #ffffff; }
+.app-timeline__title { margin-bottom: 5px; }
+.app-timeline__date { margin-bottom: 5px; color: #505a5f; }
+.app-timeline__description { margin-bottom: 0; }

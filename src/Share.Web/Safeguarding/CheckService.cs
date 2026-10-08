@@ -13,6 +13,7 @@ public class CheckService(AppDbContext db, TimeProvider clock)
             .Include(c => c.Checks)
             .Include(c => c.Applications).ThenInclude(a => a.Guests)
             .Include(c => c.Applications).ThenInclude(a => a.Host)
+            .Include(c => c.Applications).ThenInclude(a => a.DecisionUpdates)
             .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == id);
 

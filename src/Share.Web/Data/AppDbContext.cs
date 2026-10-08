@@ -19,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     public DbSet<Case> Cases => Set<Case>();
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
+    public DbSet<DecisionUpdate> DecisionUpdates => Set<DecisionUpdate>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
@@ -35,6 +36,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             || p.SponsoredApplications.Any(a => a.Council == CouncilScope)
             || p.HostedApplications.Any(a => a.Council == CouncilScope));
         b.Entity<Case>().HasQueryFilter(c => CouncilScope == null || c.Council == CouncilScope);
+        b.Entity<DecisionUpdate>().HasQueryFilter(u => CouncilScope == null || u.VisaApplication!.Council == CouncilScope);
         b.Entity<TimelineEvent>().HasQueryFilter(e => CouncilScope == null
             || ((e.VisaApplicationId == null || e.VisaApplication!.Council == CouncilScope)
                 && (e.CaseId == null || e.Case!.Council == CouncilScope)));
@@ -46,10 +48,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             e.HasIndex(a => a.Gwf);
             e.Property(a => a.Status).HasConversion<string>();
             e.Ignore(a => a.Lead);
+            e.Ignore(a => a.LatestArrival);
             e.HasOne(a => a.Sponsor).WithMany(p => p.SponsoredApplications).HasForeignKey(a => a.SponsorId);
             e.HasOne(a => a.Host).WithMany(p => p.HostedApplications).HasForeignKey(a => a.HostId);
         });
         b.Entity<Guest>().HasIndex(p => p.Gwf);
+        b.Entity<DecisionUpdate>(e =>
+        {
+            e.HasIndex(u => new { u.IngestRunId, u.RowNumber }).IsUnique();
+            e.HasOne(u => u.VisaApplication).WithMany(a => a.DecisionUpdates).HasForeignKey(u => u.VisaApplicationId);
+        });
         b.Entity<TimelineEvent>().Property(t => t.Kind).HasConversion<string>();
         b.Entity<CaseCheck>(e =>
         {

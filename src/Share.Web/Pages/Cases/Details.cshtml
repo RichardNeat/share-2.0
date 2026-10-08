@@ -83,7 +83,7 @@
                 @if (check.Locked)
                 {
                     <partial name="_CheckStatusTag" model="check.Recorded" />
-                    <p class="govuk-body-s app-secondary-text">Available when guests arrive. Record the arrival to complete this check.</p>
+                    <p class="govuk-body-s app-secondary-text">Available when guests arrive. This opens automatically when the Home Office arrivals feed shows them landing, or you can record the arrival.</p>
                 }
                 else
                 {
@@ -99,6 +99,13 @@
                     @if (check.Note is { } note)
                     {
                         <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><strong>@note</strong></p>
+                    }
+                    @if (check.Kind == CheckKind.GuestsArrived)
+                    {
+                        foreach (var arrival in c.Applications.Select(a => (App: a, Arrival: a.LatestArrival)).Where(x => x.Arrival != null))
+                        {
+                            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@arrival.App.Lead?.FullName arrived in the UK at @Ports.Name(arrival.Arrival!.ArrivalPort) on @Display.DateTime(arrival.Arrival.ArrivedAt!.Value) (Home Office arrivals feed)</p>
+                        }
                     }
                     @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is { } arrived)
                     {
@@ -165,3 +172,6 @@
         <li><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a> – @app.Lead?.FullName, submitted @Display.DateTime(app.SubmittedAt) <partial name="_VisaStatusTag" model="app.Status" /></li>
     }
 </ul>
+
+<h2 class="govuk-heading-m" id="history">Case history</h2>
+<partial name="_Timeline" model="Model.Timeline" />

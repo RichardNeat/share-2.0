@@ -293,3 +293,32 @@ A running timeline of the major decisions made while building this service, olde
 - **Why:** An announcement typed in on screen would vanish at the next reset. Putting it in `DemoSeeder` as a scripted action, applied through the same announcement service as the admin page, means it shows on every run
 - **What:** "Dev Share: Built from scratch in one hour" is added after every reset, including "Reset to empty", because an announcement is a message to users, not casework data. The "What do you want to do?" heading is removed at the team's request; each tile title becomes an h2 so headings still go down in order, and the tile list is labelled "Parts of the service" for screen readers
 - **Turned down:** writing the announcement straight into the database, which the reset would clear
+
+## 2026-10-08 · M5 Guests move
+
+### 52. Each matched arrivals row is stored as a decision update; the visa status is re-derived from all of them
+
+- **Why:** The brief's precedence rule (Arrived > Issued > Withdrawn > Refused > Confirmed) is about conflicting updates over time, so we keep every update and derive the status from the whole set, rather than overwriting it with the latest row
+- **What:** `VisaStatusRules.FromUpdate` maps one decision (Issued or GRANT with an arrival time is Arrived, without one is Issued, Voided or anything unknown is Confirmed). `Derive` takes the highest-precedence status, or Pending when there are none. Both are unit-tested for every case
+- **Idempotent:** a row already stored for that file (same file, same row number) is counted as "already ingested", not applied twice
+
+### 53. Match arrivals by GWF first (the application's or any guest's), then by UAN; skip what matches nothing
+
+- **Why:** The brief's rule. Some rows carry only one of the two references
+- **What:** Skipped rows go in the ingest summary with a reason: "No application matches this GWF or UAN", "No GWF or UAN to match on", or a date that won't parse. In file 02, `GWF000000001` is skipped and the Tkachenko row matches on UAN alone
+
+### 54. An arrival applies to the whole application, and unlocks check 4
+
+- **Why:** Only lead applicants have a GWF number, and `PERSON_IDENTIFIER` does not link to anyone in the application files, so the feed can't tell us which family member landed. We say "Kateryna Melnyk and 2 family members arrived", not claim to know each person
+- **What:** Arrival times in the feed are UK local time (dd/MM/yyyy HH:mm:ss), converted to UTC across GMT and BST, and shown back in UK time. Port codes are shown with names ("Luton (LTN)"). Check 4 opens and the case page shows where and when they landed. As with a caseworker's arrival (decision 39), the check is opened, not passed
+
+### 55. The case timeline is the event log, newest first, in the shape of the MOJ timeline pattern
+
+- **Why:** M5 Ticket 2. The event log has been recorded since M1 (decision 6), so this was mostly rendering
+- **What:** Application received, case formed, visa status changed, guests arrived, check updated and case status changed. Each entry has a heading, a `<time>` element and a short description, linking to the application where there is one. Plain HTML and CSS, no JavaScript
+- **What:** Events with the same timestamp are ordered by what logically happens first (received, then case formed, then status, arrival, check and case status), not by database ID, which EF does not guarantee. The ingest summary uses the same order, oldest first
+
+### 56. Files 03 to 06 replay through "Process next file"; file 07 (offers) waits for M12
+
+- **Why:** M5 says both feed types should replay in number order. Files 03 to 06 are visa applications and arrivals only, and ingest cleanly: 20 applications, 15 cases and 19 decision updates, with one deliberately unmatched row
+- **Open:** file 07 is the first offers-of-accommodation file. "Process next file" stops there with a clear message until offers are built (M12), so files 08 onwards wait too

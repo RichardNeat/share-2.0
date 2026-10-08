@@ -13,10 +13,19 @@
 
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Records in file</dt><dd class="govuk-summary-list__value">@r.RecordsInFile</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Applications added</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Cases formed</dt><dd class="govuk-summary-list__value">@r.CasesAdded</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New sponsors and hosts</dt><dd class="govuk-summary-list__value">@r.PeopleAdded</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New accommodations</dt><dd class="govuk-summary-list__value">@r.AccommodationsAdded</dd></div>
+    @if (r.IsArrivalsFile)
+    {
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Updates matched to an application</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa statuses changed</dt><dd class="govuk-summary-list__value">@r.StatusesChanged</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Guests arrived in the UK</dt><dd class="govuk-summary-list__value">@r.Arrivals</dd></div>
+    }
+    else
+    {
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Applications added</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Cases formed</dt><dd class="govuk-summary-list__value">@r.CasesAdded</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New sponsors and hosts</dt><dd class="govuk-summary-list__value">@r.PeopleAdded</dd></div>
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New accommodations</dt><dd class="govuk-summary-list__value">@r.AccommodationsAdded</dd></div>
+    }
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Already ingested</dt><dd class="govuk-summary-list__value">@r.AlreadyPresent</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Rows skipped</dt><dd class="govuk-summary-list__value">@r.SkippedRows.Count</dd></div>
 </dl>
@@ -37,7 +46,7 @@ else
         {
             <li>
                 <strong>@e.Title:</strong>
-                @if (e.Kind == TimelineEventKind.CaseFormed && e.CaseId is int caseId)
+                @if (e.Kind is TimelineEventKind.CaseFormed or TimelineEventKind.GuestsArrived or TimelineEventKind.VisaStatusChanged && e.CaseId is int caseId)
                 {
                     <a class="govuk-link" href="/Cases/@caseId">@e.Description</a>
                 }

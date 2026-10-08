@@ -13,6 +13,10 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa status</dt><dd class="govuk-summary-list__value"><partial name="_VisaStatusTag" model="a.Status" /></dd></div>
     <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Arrived in the UK</dt>
+        <dd class="govuk-summary-list__value">@(a.LatestArrival is { } arr ? $"{Display.DateTime(arr.ArrivedAt!.Value)} at {Ports.Name(arr.ArrivalPort)}{(arr.VoyageCode is null ? "" : $" on {arr.VoyageCode}")}" : "Not yet")</dd>
+    </div>
+    <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Case</dt>
         <dd class="govuk-summary-list__value">
             @if (a.Case is { } c) { <a class="govuk-link" href="/Cases/@c.Id">@c.Reference</a> } else { @:Not yet in a case

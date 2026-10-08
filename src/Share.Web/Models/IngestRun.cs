@@ -12,6 +12,10 @@ public class IngestRun
     public int PeopleAdded { get; set; }
     public int AccommodationsAdded { get; set; }
     public int CasesAdded { get; set; }
+    public int StatusesChanged { get; set; }
+    public int Arrivals { get; set; }
+
+    public bool IsArrivalsFile => FileName.EndsWith("-arrivals.csv");
     public List<SkippedRow> SkippedRows { get; set; } = [];
     public List<TimelineEvent> Events { get; set; } = [];
 }

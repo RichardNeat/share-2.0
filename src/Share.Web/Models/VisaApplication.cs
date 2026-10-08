@@ -25,6 +25,10 @@ public class VisaApplication
     public int IngestRunId { get; set; }
     public IngestRun? IngestRun { get; set; }
     public List<Guest> Guests { get; set; } = [];
+    public List<DecisionUpdate> DecisionUpdates { get; set; } = [];
+
+    // The latest arrival in the UK reported by the Home Office feed, if any.
+    public DecisionUpdate? LatestArrival => DecisionUpdates.Where(u => u.ArrivedAt != null).MaxBy(u => u.ArrivedAt);
 
     public Guest? Lead => Guests.OrderBy(p => p.Position).FirstOrDefault();
     public string SponsorName => $"{SponsorGivenName} {SponsorFamilyName}".Trim();

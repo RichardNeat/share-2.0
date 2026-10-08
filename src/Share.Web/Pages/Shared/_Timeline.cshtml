@@ -1,0 +1,28 @@
+@* Case history, newest first. Follows the shape of the MOJ timeline pattern: plain HTML, no JavaScript. *@
+@model IReadOnlyList<TimelineEvent>
+@if (Model.Count == 0)
+{
+    <p class="govuk-body">Nothing has happened on this case yet.</p>
+}
+else
+{
+    <ol class="app-timeline">
+        @foreach (var e in Model)
+        {
+            <li class="app-timeline__item">
+                <h3 class="govuk-heading-s app-timeline__title">@e.Title</h3>
+                <p class="govuk-body-s app-timeline__date"><time datetime="@e.OccurredAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@Display.DateTime(e.OccurredAt)</time></p>
+                <p class="govuk-body app-timeline__description">
+                    @if (e.VisaApplicationId is int appId && e.Kind != TimelineEventKind.CaseFormed)
+                    {
+                        <a class="govuk-link" href="/Applications/@appId">@e.Description</a>
+                    }
+                    else
+                    {
+                        @e.Description
+                    }
+                </p>
+            </li>
+        }
+    </ol>
+}
