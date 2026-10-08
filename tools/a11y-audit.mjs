@@ -5,7 +5,7 @@ import { spawn } from 'node:child_process';
 import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-const base = 'http://127.0.0.1:5050';
+const base = 'http://localhost:5050';
 const pages = process.argv.slice(2);
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ['--headless=new', '--remote-debugging-port=9333', '--user-data-dir=' + mkdtempSync(join(tmpdir(), 'share-a11y-')), '--disable-gpu', 'about:blank'], { stdio: 'ignore' });
