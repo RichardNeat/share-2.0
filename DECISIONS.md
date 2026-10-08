@@ -79,3 +79,37 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** On its own the logo sat small and top-aligned in an empty black bar, and nothing said what the service was. Putting a larger logo (88 px) beside the name and the tagline "Homes for Ukraine casework" fills the header and matches the artwork
 - **What:** The logo has empty alt text because the link already reads "The Share, Homes for Ukraine casework". The service name moves out of the service navigation so it isn't shown twice. The header's blue border runs full width. Page titles become `<Page> - The Share - GOV.UK`. Wide tables scroll inside their own focusable box, so the page never scrolls sideways on a phone
+
+## 2026-10-08 · M2 People and places
+
+### 16. Sponsors and hosts are one `Person` record with roles; guests stay separate
+
+- **Why:** The team clarified that sponsor and host are different roles. The sponsor backs the visa; the host is whoever the guests live with, and that may or may not be the sponsor. When one person is both (Clare Osborne sponsors and hosts application 1), they must be one record, not a sponsor record plus a host record
+- **What:** A `Person` has sponsored applications and hosted applications. The Sponsors and Hosts lists both link to one person page, which shows "Sponsor" and "Host" tags. Guests (the people on the visa form) stay as their own `Guest` records
+- **Turned down:** separate Sponsor and Host tables, which would duplicate anyone holding both roles
+
+### 17. The host is the sponsor only when the application says the guests stay at the sponsor's address
+
+- **Why:** The team said not to treat the sponsor as the host by default
+- **What:** "Yes" means the sponsor is the host. "No" means the named host is. If the question is unanswered, there is no host, and the page shows "Not given" rather than a guess
+- **Data oddity kept as-is:** application 7 says the guests won't stay at the sponsor's address, but gives the same address and names Daniel Park as host. We show exactly that
+
+### 18. Match people on unique identifiers only, never on name or date of birth
+
+- **Why:** The team pointed out that two different people can share both a name and a date of birth. An earlier draft of this milestone matched sponsors on name plus date of birth; it never shipped
+- **What:** A sponsor is identified by their email address (lower-cased and trimmed). We checked by eye that every application in the brief's data gives one and that no email is shared by different people. A sponsor without an email is never merged. A host named on an application (not the sponsor) comes with a name only, so is never merged: one record per application
+- **Later:** possible duplicates (the same host twice, say) are left to M14's suggestions, which a person confirms
+
+### 19. An accommodation is identified by its address and council
+
+- **Why:** The brief says so, and an address identifies a property, so it is a fair key. It is compared after normalising case, punctuation and spacing
+- **What:** Two applications to the same address in the same council share one accommodation record
+
+### 20. Guests are not merged across applications
+
+- **Why:** A guest has no identifier that holds across applications. Family members have no GWF number, and we won't match on names. Merging people is M13/M14's job, with a human confirming
+- **What:** `ApplicationPerson` was renamed `Guest`, and the application's list of people is now called `Guests`
+
+### 21. Console `reset` and `seed` run before the startup migration
+
+- **Why:** This milestone's migration drops and recreates the people table. Running the console commands first means they can always recover an old local `app.db`, instead of failing on a migration that conflicts with stale data

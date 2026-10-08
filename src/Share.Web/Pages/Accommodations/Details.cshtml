@@ -1,0 +1,54 @@
+@page "/Accommodations/{id:int}"
+@model Share.Web.Pages.Accommodations.DetailsModel
+@{
+    var a = Model.Accommodation;
+    ViewData["Title"] = $"{a.Address} – accommodation";
+}
+@section BeforeContent {
+    <a href="/Accommodations" class="govuk-back-link">Back to accommodations</a>
+}
+<span class="govuk-caption-l">Accommodation</span>
+<h1 class="govuk-heading-l">@a.Address</h1>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Address</dt><dd class="govuk-summary-list__value">@a.Address</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Postcode</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.Postcode)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(a.Council)</dd></div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sponsor@(Model.Sponsors.Count == 1 ? "" : "s")</dt>
+        <dd class="govuk-summary-list__value">
+            @if (Model.Sponsors.Count == 0) { @:Not given
+            }
+            else
+            {
+                <ul class="govuk-list">
+                    @foreach (var s in Model.Sponsors) { <li><a class="govuk-link" href="/People/@s.Id">@s.FullName</a></li> }
+                </ul>
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Host@(Model.Hosts.Count == 1 ? "" : "s") named on applications</dt>
+        <dd class="govuk-summary-list__value">
+            @if (Model.Hosts.Count == 0) { @:Not given
+            }
+            else
+            {
+                <ul class="govuk-list">
+                    @foreach (var h in Model.Hosts) { <li><a class="govuk-link" href="/People/@h.Id">@h.FullName</a></li> }
+                </ul>
+            }
+        </dd>
+    </div>
+</dl>
+
+<h2 class="govuk-heading-m">Guests (@Model.Guests.Count)</h2>
+<partial name="_GuestsTable" model="Model.Guests" />
+
+<h2 class="govuk-heading-m">Visa applications (@a.Applications.Count)</h2>
+<ul class="govuk-list">
+    @foreach (var app in a.Applications.OrderBy(x => x.SubmittedAt).ThenBy(x => x.Id))
+    {
+        <li><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a> – @app.Lead?.FullName <partial name="_VisaStatusTag" model="app.Status" /></li>
+    }
+</ul>

@@ -1,0 +1,42 @@
+@page
+@model Share.Web.Pages.Accommodations.IndexModel
+@{ ViewData["Title"] = "Accommodations"; }
+<h1 class="govuk-heading-l">Accommodations</h1>
+@if (Model.Accommodations.Count == 0)
+{
+    <p class="govuk-body">No accommodations yet. Process a data file from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+}
+else
+{
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+    <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">@Model.Accommodations.Count accommodation@(Model.Accommodations.Count == 1 ? "" : "s")</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Address</th>
+                <th scope="col" class="govuk-table__header">Postcode</th>
+                <th scope="col" class="govuk-table__header">Council</th>
+                <th scope="col" class="govuk-table__header">Sponsor</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Guests</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var a in Model.Accommodations)
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a></td>
+                    <td class="govuk-table__cell">@Display.OrNotGiven(a.Postcode)</td>
+                    <td class="govuk-table__cell">@Display.Council(a.Council)</td>
+                    <td class="govuk-table__cell">
+                        @foreach (var (s, i) in a.Applications.Where(x => x.Sponsor != null).Select(x => x.Sponsor!).DistinctBy(x => x.Id).OrderBy(x => x.FamilyName).Select((s, i) => (s, i)))
+                        {
+                            @(i > 0 ? ", " : "")<a class="govuk-link" href="/People/@s.Id">@s.FullName</a>
+                        }
+                    </td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@a.Applications.Sum(x => x.Guests.Count)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}

@@ -45,9 +45,23 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
         run.RecordsInFile = parsed.Count;
         run.Added = 0;
         run.AlreadyPresent = 0;
+        run.PeopleAdded = 0;
+        run.AccommodationsAdded = 0;
         run.SkippedRows.Clear();
 
         var known = (await db.VisaApplications.Select(a => a.SubmissionGuid).ToListAsync()).ToHashSet();
+        var people = await db.People.ToDictionaryAsync(x => x.MatchKey);
+        var accommodations = await db.Accommodations.ToDictionaryAsync(x => x.MatchKey);
+
+        Person? Resolve(Person? person)
+        {
+            if (person is null) return null;
+            if (people.TryGetValue(person.MatchKey, out var existing)) return existing;
+            people[person.MatchKey] = person;
+            run.PeopleAdded++;
+            return person;
+        }
+
         foreach (var p in parsed)
         {
             if (p.Application is null)
@@ -63,11 +77,21 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
 
             var app = p.Application;
             app.IngestRun = run;
+
+            // De-duplicate: link to the people and accommodation we already hold, or add new ones.
+            var hostIsSponsor = ReferenceEquals(app.Host, app.Sponsor);
+            app.Sponsor = Resolve(app.Sponsor);
+            app.Host = hostIsSponsor ? app.Sponsor : Resolve(app.Host);
+            if (app.Accommodation is { } accommodation)
+            {
+                if (accommodations.TryGetValue(accommodation.MatchKey, out var existing)) app.Accommodation = existing;
+                else { accommodations[accommodation.MatchKey] = accommodation; run.AccommodationsAdded++; }
+            }
             db.VisaApplications.Add(app);
             run.Added++;
 
             var lead = app.Lead!;
-            var others = app.People.Count - 1;
+            var others = app.Guests.Count - 1;
             run.Events.Add(new TimelineEvent
             {
                 Kind = TimelineEventKind.ApplicationReceived,

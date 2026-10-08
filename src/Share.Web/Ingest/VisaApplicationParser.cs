@@ -56,7 +56,7 @@ public static class VisaApplicationParser
             }
             string? Ans(string title) => answers.FirstOrDefault(x => x.Title == title)?.Answer is { Length: > 0 } v ? v.Trim() : null;
 
-            application.People.Add(new ApplicationPerson
+            application.Guests.Add(new Guest
             {
                 Position = position,
                 Role = Str(p, "role"),
@@ -75,6 +75,50 @@ public static class VisaApplicationParser
                 application.SponsorGivenName = Ans("Sponsor given name");
                 application.SponsorFamilyName = Ans("Sponsor family name");
                 application.Council = Ans("Local authority of UK address");
+                application.StayingWithSponsor = Ans("Will you be staying at your sponsor's address?") switch
+                {
+                    "Yes" => true,
+                    "No" => false,
+                    _ => null,
+                };
+                application.HostGivenName = Ans("Host given name");
+                application.HostFamilyName = Ans("Host family name");
+
+                var sponsorDob = DateOnly.TryParseExact(Ans("Sponsor date of birth"), "yyyy-MM-dd", out var sd) ? sd : (DateOnly?)null;
+                if (!string.IsNullOrWhiteSpace($"{application.SponsorGivenName}{application.SponsorFamilyName}{Ans("Sponsor email address")}"))
+                {
+                    application.Sponsor = new Person
+                    {
+                        MatchKey = RecordKeys.Sponsor(Ans("Sponsor email address"), uan),
+                        GivenName = application.SponsorGivenName,
+                        FamilyName = application.SponsorFamilyName,
+                        DateOfBirth = sponsorDob,
+                        Email = Ans("Sponsor email address"),
+                        Telephone = Ans("Sponsor telephone number"),
+                        Address = Ans("Sponsor address"),
+                        Postcode = Ans("Sponsor postcode"),
+                        Council = Ans("Sponsor local authority"),
+                    };
+                }
+
+                // The host is the sponsor when the guests stay at the sponsor's address; otherwise the named host.
+                // If the question is unanswered we do not assume the sponsor is the host.
+                if (application.StayingWithSponsor == true)
+                    application.Host = application.Sponsor;
+                else if (RecordKeys.Host(application.HostGivenName, application.HostFamilyName, uan) is { } hostKey)
+                    application.Host = new Person { MatchKey = hostKey, GivenName = application.HostGivenName, FamilyName = application.HostFamilyName };
+
+                var address = Ans("UK address where you will be staying");
+                if (RecordKeys.Accommodation(address, application.Council) is { } accommodationKey)
+                {
+                    application.Accommodation = new Accommodation
+                    {
+                        MatchKey = accommodationKey,
+                        Address = address!,
+                        Postcode = Ans("Postcode of UK address"),
+                        Council = application.Council,
+                    };
+                }
             }
         }
         return new(row, application, reference, null);

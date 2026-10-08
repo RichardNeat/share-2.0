@@ -1,0 +1,14 @@
+@page
+@model Share.Web.Pages.Sponsors.IndexModel
+@using Share.Web.Pages.Shared
+@{ ViewData["Title"] = "Sponsors"; }
+<h1 class="govuk-heading-l">Sponsors</h1>
+<p class="govuk-body">A sponsor backs a guest's visa application. They may or may not be the guest's host.</p>
+@if (Model.People.Count == 0)
+{
+    <p class="govuk-body">No sponsors yet. Process a data file from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+}
+else
+{
+    <partial name="_PeopleTable" model="new PeopleTable(Model.People, PersonRole.Sponsor)" />
+}

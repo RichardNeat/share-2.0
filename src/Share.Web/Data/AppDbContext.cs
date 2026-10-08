@@ -6,7 +6,9 @@ namespace Share.Web.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<VisaApplication> VisaApplications => Set<VisaApplication>();
-    public DbSet<ApplicationPerson> ApplicationPeople => Set<ApplicationPerson>();
+    public DbSet<Guest> Guests => Set<Guest>();
+    public DbSet<Person> People => Set<Person>();
+    public DbSet<Accommodation> Accommodations => Set<Accommodation>();
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
 
@@ -19,9 +21,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(a => a.Gwf);
             e.Property(a => a.Status).HasConversion<string>();
             e.Ignore(a => a.Lead);
+            e.HasOne(a => a.Sponsor).WithMany(p => p.SponsoredApplications).HasForeignKey(a => a.SponsorId);
+            e.HasOne(a => a.Host).WithMany(p => p.HostedApplications).HasForeignKey(a => a.HostId);
         });
-        b.Entity<ApplicationPerson>().HasIndex(p => p.Gwf);
+        b.Entity<Guest>().HasIndex(p => p.Gwf);
         b.Entity<TimelineEvent>().Property(t => t.Kind).HasConversion<string>();
         b.Entity<IngestRun>().HasIndex(r => r.FileName).IsUnique();
+        b.Entity<Person>().HasIndex(x => x.MatchKey).IsUnique();
+        b.Entity<Accommodation>().HasIndex(x => x.MatchKey).IsUnique();
     }
 }

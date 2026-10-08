@@ -15,17 +15,35 @@
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">UAN</dt><dd class="govuk-summary-list__value">@a.Uan</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">GWF number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.Gwf)</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Submitted</dt><dd class="govuk-summary-list__value">@Display.DateTime(a.SubmittedAt)</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Sponsor</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.SponsorName)</dd></div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sponsor</dt>
+        <dd class="govuk-summary-list__value">
+            @if (a.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Accommodation</dt>
+        <dd class="govuk-summary-list__value">
+            @if (a.Accommodation is { } acc) { <a class="govuk-link" href="/Accommodations/@acc.Id">@acc.Address</a> } else { @:Not given
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Host</dt>
+        <dd class="govuk-summary-list__value">@if (a.Host is { } h) { <a class="govuk-link" href="/People/@h.Id">@h.FullName</a> } else { @:Not given
+            }@(a.StayingWithSponsor switch { true => " (the sponsor: guests stay at the sponsor's address)", false => " (not the sponsor: guests stay elsewhere)", _ => "" })</dd>
+    </div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(a.Council)</dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">People on this application</dt><dd class="govuk-summary-list__value">@a.People.Count</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">People on this application</dt><dd class="govuk-summary-list__value">@a.Guests.Count</dd></div>
 </dl>
 
 <h2 class="govuk-heading-l">Answers</h2>
-@foreach (var person in a.People.OrderBy(p => p.Position))
+@foreach (var person in a.Guests.OrderBy(p => p.Position))
 {
     <div class="govuk-summary-card">
         <div class="govuk-summary-card__title-wrapper">
-            <h3 class="govuk-summary-card__title">@person.FullName <span class="govuk-!-font-weight-regular">(@(person.IsLead ? "lead applicant" : "family member"))</span></h3>
+            <h3 class="govuk-summary-card__title"><a class="govuk-link" href="/Guests/@person.Id">@person.FullName</a> <span class="govuk-!-font-weight-regular">(@(person.IsLead ? "lead applicant" : "family member"))</span></h3>
         </div>
         <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">

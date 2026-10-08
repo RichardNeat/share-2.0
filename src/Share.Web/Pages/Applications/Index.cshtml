@@ -49,8 +49,11 @@ else
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell"><a class="govuk-link" href="/Applications/@a.Id">@a.Lead?.FullName</a></td>
                     <td class="govuk-table__cell">@a.Uan</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric">@a.People.Count</td>
-                    <td class="govuk-table__cell">@Display.OrNotGiven(a.SponsorName)</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@a.Guests.Count</td>
+                    <td class="govuk-table__cell">
+                        @if (a.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
+                        }
+                    </td>
                     <td class="govuk-table__cell">@Display.Council(a.Council)</td>
                     <td class="govuk-table__cell"><partial name="_VisaStatusTag" model="a.Status" /></td>
                 </tr>

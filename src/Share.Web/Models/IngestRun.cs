@@ -9,6 +9,8 @@ public class IngestRun
     public int RecordsInFile { get; set; }
     public int Added { get; set; }
     public int AlreadyPresent { get; set; }
+    public int PeopleAdded { get; set; }
+    public int AccommodationsAdded { get; set; }
     public List<SkippedRow> SkippedRows { get; set; } = [];
     public List<TimelineEvent> Events { get; set; } = [];
 }

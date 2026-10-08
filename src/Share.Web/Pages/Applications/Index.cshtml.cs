@@ -15,7 +15,7 @@ public class IndexModel(AppDbContext db) : PageModel
 
     public async Task OnGetAsync()
     {
-        var query = db.VisaApplications.Include(a => a.People).AsQueryable();
+        var query = db.VisaApplications.Include(a => a.Guests).Include(a => a.Sponsor).AsQueryable();
         if (Status is not null) query = query.Where(a => a.Status == Status);
         Applications = await query.OrderBy(a => a.SubmittedAt).ThenBy(a => a.Uan).ToListAsync();
     }

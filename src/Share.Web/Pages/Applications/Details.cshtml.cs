@@ -13,7 +13,10 @@ public class DetailsModel(AppDbContext db) : PageModel
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var app = await db.VisaApplications
-            .Include(a => a.People).ThenInclude(p => p.Answers)
+            .Include(a => a.Guests).ThenInclude(p => p.Answers)
+            .Include(a => a.Sponsor)
+            .Include(a => a.Host)
+            .Include(a => a.Accommodation)
             .FirstOrDefaultAsync(a => a.Id == id);
         if (app is null) return NotFound();
         Application = app;

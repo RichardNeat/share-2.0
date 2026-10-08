@@ -22,11 +22,7 @@ builder.Services.AddScoped<DemoSeeder>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-}
-
+// Console commands run before the startup migration, so they can recover any old database.
 // Console commands: `dotnet run --project src/Share.Web -- reset` or `-- seed --through 6`
 if (args.Length > 0 && args[0] is "reset" or "seed")
 {
@@ -45,6 +41,11 @@ if (args.Length > 0 && args[0] is "reset" or "seed")
         Console.WriteLine($"Database reset and seeded with {count} file(s).");
     }
     return;
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
 }
 
 if (!app.Environment.IsDevelopment())

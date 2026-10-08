@@ -1,0 +1,35 @@
+@* Guests with their application, sponsor and accommodation loaded. *@
+@model IReadOnlyList<Guest>
+<div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-visually-hidden">Guests</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Date of birth</th>
+            <th scope="col" class="govuk-table__header">Visa application</th>
+            <th scope="col" class="govuk-table__header">Accommodation</th>
+            <th scope="col" class="govuk-table__header">Sponsor</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var g in Model)
+        {
+            var app = g.VisaApplication!;
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a></td>
+                <td class="govuk-table__cell">@Display.Date(g.DateOfBirth)</td>
+                <td class="govuk-table__cell"><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a></td>
+                <td class="govuk-table__cell">
+                    @if (app.Accommodation is { } a) { <a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a> } else { @:Not given
+                    }
+                </td>
+                <td class="govuk-table__cell">
+                    @if (app.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>

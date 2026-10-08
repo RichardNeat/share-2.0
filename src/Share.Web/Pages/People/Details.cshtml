@@ -1,0 +1,59 @@
+@page "/People/{id:int}"
+@model Share.Web.Pages.People.DetailsModel
+@{
+    var p = Model.Person;
+    var roles = string.Join(" and ", new[] { p.IsSponsor ? "sponsor" : null, p.IsHost ? "host" : null }.Where(r => r != null));
+    ViewData["Title"] = $"{p.FullName} – {roles}";
+}
+@section BeforeContent {
+    <a href="@(p.IsSponsor ? "/Sponsors" : "/Hosts")" class="govuk-back-link">Back to @(p.IsSponsor ? "sponsors" : "hosts")</a>
+}
+<span class="govuk-caption-l">@(char.ToUpper(roles[0]) + roles[1..])</span>
+<h1 class="govuk-heading-l">@p.FullName</h1>
+<p class="govuk-body"><partial name="_RoleTags" model="p" /></p>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Date of birth</dt><dd class="govuk-summary-list__value">@Display.Date(p.DateOfBirth)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Email address</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(p.Email)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Telephone</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(p.Telephone)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Home address</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(p.Address)@(string.IsNullOrEmpty(p.Postcode) ? "" : $", {p.Postcode}")</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(p.Council)</dd></div>
+</dl>
+
+<h2 class="govuk-heading-m">Accommodations (@Model.Accommodations.Count)</h2>
+@if (Model.Accommodations.Count == 0)
+{
+    <p class="govuk-body">No accommodation given on this person's applications.</p>
+}
+else
+{
+    <ul class="govuk-list govuk-!-margin-bottom-9">
+        @foreach (var a in Model.Accommodations)
+        {
+            <li><a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a> (@Display.Council(a.Council))</li>
+        }
+    </ul>
+}
+
+@if (p.IsSponsor)
+{
+    <h2 class="govuk-heading-m">Guests they sponsor (@Model.SponsoredGuests.Count)</h2>
+    <partial name="_GuestsTable" model="Model.SponsoredGuests" />
+}
+@if (p.IsHost)
+{
+    <h2 class="govuk-heading-m">Guests they host (@Model.HostedGuests.Count)</h2>
+    <partial name="_GuestsTable" model="Model.HostedGuests" />
+}
+
+<h2 class="govuk-heading-m">Visa applications (@Model.Applications.Count)</h2>
+<ul class="govuk-list">
+    @foreach (var app in Model.Applications)
+    {
+        <li>
+            <a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a> – @app.Lead?.FullName
+            (@string.Join(" and ", new[] { app.SponsorId == p.Id ? "sponsor" : null, app.HostId == p.Id ? "host" : null }.Where(r => r != null)))
+            <partial name="_VisaStatusTag" model="app.Status" />
+        </li>
+    }
+</ul>

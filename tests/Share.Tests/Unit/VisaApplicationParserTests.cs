@@ -52,8 +52,8 @@ public class VisaApplicationParserTests
     {
         var app = VisaApplicationParser.Parse(OneFamily)[0].Application!;
 
-        Assert.Equal(2, app.People.Count);
-        var child = app.People[1];
+        Assert.Equal(2, app.Guests.Count);
+        var child = app.Guests[1];
         Assert.False(child.IsLead);
         Assert.Equal("Andriy", child.GivenName);
         Assert.Equal(new DateOnly(2014, 1, 22), child.DateOfBirth);

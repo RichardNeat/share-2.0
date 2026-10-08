@@ -1,0 +1,69 @@
+@page "/Guests/{id:int}"
+@model Share.Web.Pages.Guests.DetailsModel
+@{
+    var g = Model.Guest;
+    var app = g.VisaApplication!;
+    ViewData["Title"] = $"{g.FullName} – guest";
+}
+@section BeforeContent {
+    <a href="/Guests" class="govuk-back-link">Back to guests</a>
+}
+<span class="govuk-caption-l">Guest</span>
+<h1 class="govuk-heading-l">@g.FullName</h1>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">On the application as</dt><dd class="govuk-summary-list__value">@(g.IsLead ? "Lead applicant" : "Family member")</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Date of birth</dt><dd class="govuk-summary-list__value">@Display.Date(g.DateOfBirth)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Nationality</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.Nationality)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Passport number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.PassportNumber)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">GWF number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.Gwf ?? (g.IsLead ? null : app.Gwf is null ? null : $"{app.Gwf} (lead applicant's)"))</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa status</dt><dd class="govuk-summary-list__value"><partial name="_VisaStatusTag" model="app.Status" /></dd></div>
+</dl>
+
+<h2 class="govuk-heading-m">Linked records</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Visa application</dt>
+        <dd class="govuk-summary-list__value"><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a></dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sponsor</dt>
+        <dd class="govuk-summary-list__value">
+            @if (app.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Accommodation</dt>
+        <dd class="govuk-summary-list__value">
+            @if (app.Accommodation is { } a) { <a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a> } else { @:Not given
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Host</dt>
+        <dd class="govuk-summary-list__value">
+            @if (app.Host is { } h) { <a class="govuk-link" href="/People/@h.Id">@h.FullName</a> } else { @:Not given
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Travelling with</dt>
+        <dd class="govuk-summary-list__value">
+            @{ var others = app.Guests.Where(p => p.Id != g.Id).OrderBy(p => p.Position).ToList(); }
+            @if (others.Count == 0)
+            {
+                @:Nobody else on this application
+            }
+            else
+            {
+                <ul class="govuk-list">
+                    @foreach (var o in others)
+                    {
+                        <li><a class="govuk-link" href="/Guests/@o.Id">@o.FullName</a></li>
+                    }
+                </ul>
+            }
+        </dd>
+    </div>
+</dl>

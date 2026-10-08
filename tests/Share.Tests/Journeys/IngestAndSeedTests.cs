@@ -23,8 +23,8 @@ public class IngestAndSeedTests : IClassFixture<AppFactory>
         await _factory.SeedThroughAsync(1);
         var (apps, people, family) = await WithDb(async (db, _) => (
             await db.VisaApplications.CountAsync(),
-            await db.ApplicationPeople.CountAsync(),
-            await db.ApplicationPeople.CountAsync(p => p.Position > 1)));
+            await db.Guests.CountAsync(),
+            await db.Guests.CountAsync(p => p.Position > 1)));
 
         Assert.Equal(8, apps);
         Assert.Equal(12, people);
@@ -50,8 +50,8 @@ public class IngestAndSeedTests : IClassFixture<AppFactory>
         {
             await _factory.SeedThroughAsync(99);
             return await WithDb(async (db, _) => string.Join("\n",
-                (await db.VisaApplications.Include(a => a.People).OrderBy(a => a.Id).ToListAsync())
-                    .Select(a => $"{a.Id}|{a.Uan}|{a.Status}|{string.Join(",", a.People.OrderBy(p => p.Id).Select(p => $"{p.Id}:{p.FullName}"))}"))
+                (await db.VisaApplications.Include(a => a.Guests).OrderBy(a => a.Id).ToListAsync())
+                    .Select(a => $"{a.Id}|{a.Uan}|{a.Status}|{string.Join(",", a.Guests.OrderBy(p => p.Id).Select(p => $"{p.Id}:{p.FullName}"))}"))
                 + "\n" + string.Join("\n", (await db.TimelineEvents.OrderBy(e => e.Id).ToListAsync())
                     .Select(e => $"{e.Id}|{e.OccurredAt:O}|{e.Description}|{e.VisaApplicationId}")));
         }

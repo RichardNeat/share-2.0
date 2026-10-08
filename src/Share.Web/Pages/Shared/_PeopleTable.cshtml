@@ -1,0 +1,31 @@
+@using Share.Web.Pages.Shared
+@model PeopleTable
+@{ var noun = Model.Role == PersonRole.Sponsor ? "sponsor" : "host"; }
+<div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">@Model.People.Count @noun@(Model.People.Count == 1 ? "" : "s")</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Roles</th>
+            <th scope="col" class="govuk-table__header">Council</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Applications</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Guests</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var p in Model.People)
+        {
+            var apps = Model.ApplicationsFor(p).ToList();
+            var council = p.Council ?? apps.Select(a => a.Council).FirstOrDefault(c => !string.IsNullOrEmpty(c));
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell"><a class="govuk-link" href="/People/@p.Id">@p.FullName</a></td>
+                <td class="govuk-table__cell"><partial name="_RoleTags" model="p" /></td>
+                <td class="govuk-table__cell">@Display.Council(council)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@apps.Count</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@apps.Sum(a => a.Guests.Count)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>

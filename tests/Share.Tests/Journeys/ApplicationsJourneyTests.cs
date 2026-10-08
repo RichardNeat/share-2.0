@@ -90,6 +90,10 @@ public class ApplicationsJourneyTests : IClassFixture<AppFactory>
     [InlineData("/")]
     [InlineData("/Applications")]
     [InlineData("/Admin")]
+    [InlineData("/Guests")]
+    [InlineData("/Sponsors")]
+    [InlineData("/Hosts")]
+    [InlineData("/Accommodations")]
     public async Task Every_page_passes_the_accessibility_checks(string url)
     {
         await _factory.SeedThroughAsync(1);
