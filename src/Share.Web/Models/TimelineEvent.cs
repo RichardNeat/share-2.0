@@ -8,6 +8,8 @@ public enum TimelineEventKind
     CaseStatusChanged,
     GuestsArrived,
     VisaStatusChanged,
+    OfferReceived,
+    CaseRematched,
 }
 
 public static class TimelineOrder
@@ -20,7 +22,9 @@ public static class TimelineOrder
         TimelineEventKind.VisaStatusChanged => 2,
         TimelineEventKind.GuestsArrived => 3,
         TimelineEventKind.CheckUpdated => 4,
-        TimelineEventKind.CaseStatusChanged => 5,
+        TimelineEventKind.CaseStatusChanged => 6,
+        TimelineEventKind.CaseRematched => 5,
+        TimelineEventKind.OfferReceived => 0,
         _ => 6,
     };
 
@@ -44,5 +48,7 @@ public class TimelineEvent
     public VisaApplication? VisaApplication { get; set; }
     public int? CaseId { get; set; }
     public Case? Case { get; set; }
+    public int? OfferId { get; set; }
+    public Offer? Offer { get; set; }
     public int? IngestRunId { get; set; }
 }

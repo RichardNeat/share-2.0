@@ -25,6 +25,7 @@ builder.Services.AddSingleton<TimeProvider>(
 builder.Services.AddScoped<IngestService>();
 builder.Services.AddScoped<DemoSeeder>();
 builder.Services.AddScoped<Share.Web.Safeguarding.CheckService>();
+builder.Services.AddScoped<Share.Web.Safeguarding.RematchService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 

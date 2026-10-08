@@ -13,7 +13,11 @@
 
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Records in file</dt><dd class="govuk-summary-list__value">@r.RecordsInFile</dd></div>
-    @if (r.IsArrivalsFile)
+    @if (r.IsOffersFile)
+    {
+        <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Offers added</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
+    }
+    else if (r.IsArrivalsFile)
     {
         <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Updates matched to an application</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
         <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa statuses changed</dt><dd class="govuk-summary-list__value">@r.StatusesChanged</dd></div>
@@ -49,6 +53,10 @@ else
                 @if (e.Kind is TimelineEventKind.CaseFormed or TimelineEventKind.GuestsArrived or TimelineEventKind.VisaStatusChanged && e.CaseId is int caseId)
                 {
                     <a class="govuk-link" href="/Cases/@caseId">@e.Description</a>
+                }
+                else if (e.Kind == TimelineEventKind.OfferReceived && e.OfferId is int offerId)
+                {
+                    <a class="govuk-link" href="/Offers/@offerId">@e.Description</a>
                 }
                 else if (e.VisaApplicationId is int appId)
                 {

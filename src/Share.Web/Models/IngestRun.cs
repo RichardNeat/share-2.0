@@ -16,6 +16,7 @@ public class IngestRun
     public int Arrivals { get; set; }
 
     public bool IsArrivalsFile => FileName.EndsWith("-arrivals.csv");
+    public bool IsOffersFile => FileName.EndsWith("-eoi-offers.json");
     public List<SkippedRow> SkippedRows { get; set; } = [];
     public List<TimelineEvent> Events { get; set; } = [];
 }

@@ -1,0 +1,47 @@
+@page "/Cases/{id:int}/Rematch/{offerId:int}"
+@model Share.Web.Pages.Cases.RematchConfirmModel
+@{
+    var c = Model.Case;
+    var o = Model.Fit.Offer;
+    ViewData["Title"] = $"Check the rematch – case {c.Reference}";
+}
+@section BeforeContent {
+    <a href="/Cases/@c.Id/Rematch" class="govuk-back-link">Back to offers</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Case @c.Reference · @c.Title</span>
+        <h1 class="govuk-heading-l">Check the rematch before you confirm</h1>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Household</dt><dd class="govuk-summary-list__value">@c.Title (@c.Guests.Count() people)</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Moving from</dt><dd class="govuk-summary-list__value">@(c.Accommodation?.Address ?? "No recorded address")</dd></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Moving to</dt>
+                <dd class="govuk-summary-list__value">@o.Address@(string.IsNullOrEmpty(o.Postcode) ? "" : $", {o.Postcode}")</dd>
+                <dd class="govuk-summary-list__actions"><a class="govuk-link" href="/Cases/@c.Id/Rematch">Change<span class="govuk-visually-hidden"> offer</span></a></dd>
+            </div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New host</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(o.HostName)</dd></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Fit</dt>
+                <dd class="govuk-summary-list__value">
+                    <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+                        @foreach (var reason in Model.Fit.Reasons) { <li>@reason</li> }
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">Warning</span>
+                Confirming resets all four safeguarding checks to not started: it is a new address and a new host, so everything is checked again.
+            </strong>
+        </div>
+        <form method="post">
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button">Confirm rematch</button>
+                <a class="govuk-link" href="/Cases/@c.Id">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

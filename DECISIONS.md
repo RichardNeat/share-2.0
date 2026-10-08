@@ -331,3 +331,25 @@ A running timeline of the major decisions made while building this service, olde
 - **What:** On the left, in the shape of the MOJ side navigation: "Case sections" (summary, safeguarding checks, guests, visa applications, case history) jump to headings on the same page, and "Actions" links to each flow ("Update check 1: accommodation exists", "Record arrival" while check 4 is locked, "Change arrival date" once recorded). It is a `<nav aria-label="Case">` landmark with real links and descriptive link text. It sticks while scrolling on wider screens (CSS `position: sticky`) and sits above the content on a phone. No JavaScript
 - **Turned down:** GOV.UK tabs, which need JavaScript (we use none) and would hide most of the case during the demo. Also turned down: a separate page per section, which would let the navigation show where you are but costs a click per view. Worth revisiting if the case page keeps growing
 - **Bug caught by a test:** lower-casing check names for link text turned "DBS" into "dBS"; acronyms now keep their capitals
+
+## 2026-10-08 · M12 Fresh offers
+
+### 58. Offers (expressions of interest) are their own records, ingested from files 07, 12 and 18
+
+- **What:** One `Offer` per submission reference, so reprocessing never duplicates. The offer's council is taken from its town or city: the files give no council, and both councils are cities (Topsham's offer gives "Exeter"). Offers are scoped by council like everything else, and listed on a new Offers page, open first
+- **Result:** All 20 data files now run end to end through "Process next file": 14 offers, 59 guests, and only the two deliberately unmatched arrivals rows skipped
+
+### 59. A case needs a rematch when any of its safeguarding checks has failed
+
+- **Why:** The brief says a failed check or a withdrawn sponsor breaks a sponsorship. A failed check is the signal we have. A withdrawn visa is the guest withdrawing, not the sponsor, so it does not count
+- **What:** A red "Needs rematch" tag on the case list and case page, a warning on the case page, and a "Rematch to an open offer" action in the side navigation
+
+### 60. Rematch is two GOV.UK steps: choose an offer ranked by fit, then confirm
+
+- **What:** Offers are ranked by room for the household (children can use an adult's bed, not the other way round), then the same council, then available now, then the tightest fit, then soonest available. Each option says why ("Room for this household of 1 adult and 2 children", "Same council (Exeter)", "Available now"), and unsuitable offers are still listed but labelled "Too small". The confirm page is a check-answers summary, with a warning that all checks will reset
+- **On confirm:** the case gets the offer's accommodation (reused if we already hold that address) and its host as a `Person` (matched by email, like a sponsor). The case's council follows the new address. All four checks and any caseworker-recorded arrival are reset. The offer is marked taken by the case, and the timeline records the move and the status change
+- **Turned down:** matching households to offers automatically. The brief asks for a caseworker to pick and confirm
+
+### 61. Cases grow as later files add families to the same sponsor and address
+
+- **Seen in the data:** by file 08 the Melnyk case becomes "Melnyk and Romanyuk households", and a third family joins in file 19. Tests now find cases by the start of their title rather than an exact one, and rematch tests assert the best-ranked offer rather than a fixed address

@@ -13,6 +13,11 @@ public class Case
     public List<VisaApplication> Applications { get; set; } = [];
     public List<CaseCheck> Checks { get; set; } = [];
 
+    // Set by a rematch: the case's new host, replacing the hosts named on its applications.
+    public int? HostId { get; set; }
+    public Person? Host { get; set; }
+    public DateTime? RematchedAt { get; set; }
+
     // Recorded by a caseworker on the case page. The arrivals feed (M5) can also show guests as arrived.
     public DateOnly? ArrivalRecordedOn { get; set; }
     public DateTime? ArrivalRecordedAt { get; set; }

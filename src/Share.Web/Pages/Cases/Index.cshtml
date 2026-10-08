@@ -36,6 +36,7 @@ else
                     <td class="govuk-table__cell">
                         <partial name="_CaseStatusTag" model="assessment.Status" />
                         @if (assessment.EnhancedDbsRequired) { <br /><partial name="_EnhancedDbsTag" /> }
+                        @if (Share.Web.Safeguarding.RematchRules.NeedsRematch(assessment)) { <br /><partial name="_NeedsRematchTag" /> }
                     </td>
                 </tr>
             }

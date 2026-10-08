@@ -24,6 +24,10 @@
 
     <h2 class="govuk-heading-s app-side-nav__heading">Actions</h2>
     <ul class="app-side-nav__list">
+        @if (Share.Web.Safeguarding.RematchRules.NeedsRematch(Model.Assessment))
+        {
+            <li class="app-side-nav__item"><a class="govuk-link govuk-link--no-visited-state app-side-nav__link" href="/Cases/@c.Id/Rematch">Rematch to an open offer</a></li>
+        }
         @foreach (var check in Model.Assessment.Checks)
         {
             var name = Display.CheckName(check.Kind);

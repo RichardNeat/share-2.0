@@ -1,0 +1,41 @@
+@page
+@model Share.Web.Pages.Offers.IndexModel
+@{ ViewData["Title"] = "Offers of accommodation"; }
+<h1 class="govuk-heading-l">Offers of accommodation</h1>
+<p class="govuk-body">Expressions of interest from people offering a room, with no guest attached yet. Caseworkers rematch households onto open offers.</p>
+@if (Model.Offers.Count == 0)
+{
+    <p class="govuk-body">No offers yet. They arrive in the expressions of interest files: process them from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+}
+else
+{
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="offers-caption">
+    <table class="govuk-table">
+        <caption id="offers-caption" class="govuk-table__caption govuk-table__caption--m">@Model.Offers.Count(o => o.Status == OfferStatus.Open) open, @Model.Offers.Count(o => o.Status == OfferStatus.Taken) taken</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Address</th>
+                <th scope="col" class="govuk-table__header">Council</th>
+                <th scope="col" class="govuk-table__header">Sleeps</th>
+                <th scope="col" class="govuk-table__header">Available from</th>
+                <th scope="col" class="govuk-table__header">Status</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var o in Model.Offers)
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" href="/Offers/@o.Id">@o.Address</a>
+                        <span class="app-secondary-text">Offered by @Display.OrNotGiven(o.HostName)</span>
+                    </td>
+                    <td class="govuk-table__cell">@Display.Council(o.Council)</td>
+                    <td class="govuk-table__cell">@(o.Adults ?? 0) adult@(o.Adults == 1 ? "" : "s"), @(o.Children ?? 0) child@(o.Children == 1 ? "" : "ren")</td>
+                    <td class="govuk-table__cell">@Display.Date(o.AvailableFrom)</td>
+                    <td class="govuk-table__cell"><partial name="_OfferStatusTag" model="o.Status" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}

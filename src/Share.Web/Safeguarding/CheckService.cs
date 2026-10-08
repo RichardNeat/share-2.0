@@ -10,6 +10,7 @@ public class CheckService(AppDbContext db, TimeProvider clock)
         db.Cases
             .Include(c => c.Sponsor)
             .Include(c => c.Accommodation)
+            .Include(c => c.Host)
             .Include(c => c.Checks)
             .Include(c => c.Applications).ThenInclude(a => a.Guests)
             .Include(c => c.Applications).ThenInclude(a => a.Host)

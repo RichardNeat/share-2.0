@@ -1,0 +1,32 @@
+@page "/Offers/{id:int}"
+@model Share.Web.Pages.Offers.DetailsModel
+@{
+    var o = Model.Offer;
+    ViewData["Title"] = $"{o.Address} – offer of accommodation";
+    string YesNo(bool? b) => b switch { true => "Yes", false => "No", _ => "Not given" };
+}
+@section BeforeContent {
+    <a href="/Offers" class="govuk-back-link">Back to offers</a>
+}
+<span class="govuk-caption-l">Offer of accommodation @o.SubmissionReference</span>
+<h1 class="govuk-heading-l">@o.Address</h1>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Status</dt><dd class="govuk-summary-list__value">
+        <partial name="_OfferStatusTag" model="o.Status" />
+        @if (o.TakenByCase is { } taken)
+        {
+            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Taken by <a class="govuk-link" href="/Cases/@taken.Id">case @taken.Reference</a> on @Display.DateTime(o.TakenAt!.Value)</p>
+        }
+    </dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Offered by</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(o.HostName)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Email address</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(o.Email)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Telephone</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(o.Telephone)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Address</dt><dd class="govuk-summary-list__value">@o.Address@(string.IsNullOrEmpty(o.Postcode) ? "" : $", {o.Postcode}")</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(o.Council)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Available from</dt><dd class="govuk-summary-list__value">@Display.Date(o.AvailableFrom)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Sleeps</dt><dd class="govuk-summary-list__value">@(o.Adults?.ToString() ?? "Not given") adults, @(o.Children?.ToString() ?? "not given") children</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Bedrooms</dt><dd class="govuk-summary-list__value">@(o.Bedrooms?.ToString() ?? "Not given")</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Step-free access</dt><dd class="govuk-summary-list__value">@YesNo(o.StepFree)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Accepts pets</dt><dd class="govuk-summary-list__value">@YesNo(o.Pets)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Submitted</dt><dd class="govuk-summary-list__value">@Display.DateTime(o.SubmittedAt)</dd></div>
+</dl>

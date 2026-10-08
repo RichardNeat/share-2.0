@@ -1,0 +1,66 @@
+@page "/Cases/{id:int}/Rematch"
+@model Share.Web.Pages.Cases.RematchModel
+@{
+    ViewData["Title"] = (Model.Error is null ? "" : "Error: ") + $"Choose a new offer – case {Model.Case.Reference}";
+}
+@section BeforeContent {
+    <a href="/Cases/@Model.Case.Id" class="govuk-back-link">Back to case</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @if (Model.Error is not null)
+        {
+            <div class="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <ul class="govuk-list govuk-error-summary__list"><li><a href="#OfferId">@Model.Error</a></li></ul>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.Offers.Count == 0)
+        {
+            <span class="govuk-caption-l">Case @Model.Case.Reference · @Model.Case.Title</span>
+            <h1 class="govuk-heading-l">There are no open offers</h1>
+            <p class="govuk-body">Offers arrive in the expressions of interest files. Process more files from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+        }
+        else
+        {
+            <form method="post" novalidate>
+                <div class="govuk-form-group @(Model.Error is null ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset" aria-describedby="offer-hint@(Model.Error is null ? "" : " offer-error")">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <span class="govuk-caption-l">Case @Model.Case.Reference · @Model.Case.Title</span>
+                            <h1 class="govuk-fieldset__heading">Choose a new offer for this household</h1>
+                        </legend>
+                        <div id="offer-hint" class="govuk-hint">Best fits are listed first: room for everyone, the same council, available now. You will confirm on the next page.</div>
+                        @if (Model.Error is not null)
+                        {
+                            <p id="offer-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> @Model.Error</p>
+                        }
+                        <div class="govuk-radios">
+                            @for (var i = 0; i < Model.Offers.Count; i++)
+                            {
+                                var fit = Model.Offers[i];
+                                var inputId = i == 0 ? "OfferId" : $"OfferId-{fit.Offer.Id}";
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="@inputId" name="OfferId" type="radio" value="@fit.Offer.Id" checked="@(Model.OfferId == fit.Offer.Id)" aria-describedby="@inputId-hint" />
+                                    <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="@inputId">@fit.Offer.Address</label>
+                                    <div id="@inputId-hint" class="govuk-hint govuk-radios__hint">
+                                        Offered by @Display.OrNotGiven(fit.Offer.HostName).
+                                        @string.Join(". ", fit.Reasons).
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button">Continue</button>
+                    <a class="govuk-link" href="/Cases/@Model.Case.Id">Cancel</a>
+                </div>
+            </form>
+        }
+    </div>
+</div>

@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
     public DbSet<DecisionUpdate> DecisionUpdates => Set<DecisionUpdate>();
+    public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
@@ -36,10 +37,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             || p.SponsoredApplications.Any(a => a.Council == CouncilScope)
             || p.HostedApplications.Any(a => a.Council == CouncilScope));
         b.Entity<Case>().HasQueryFilter(c => CouncilScope == null || c.Council == CouncilScope);
+        b.Entity<Offer>().HasQueryFilter(o => CouncilScope == null || o.Council == CouncilScope);
         b.Entity<DecisionUpdate>().HasQueryFilter(u => CouncilScope == null || u.VisaApplication!.Council == CouncilScope);
         b.Entity<TimelineEvent>().HasQueryFilter(e => CouncilScope == null
             || ((e.VisaApplicationId == null || e.VisaApplication!.Council == CouncilScope)
-                && (e.CaseId == null || e.Case!.Council == CouncilScope)));
+                && (e.CaseId == null || e.Case!.Council == CouncilScope)
+                && (e.OfferId == null || e.Offer!.Council == CouncilScope)));
 
         b.Entity<VisaApplication>(e =>
         {
@@ -53,6 +56,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             e.HasOne(a => a.Host).WithMany(p => p.HostedApplications).HasForeignKey(a => a.HostId);
         });
         b.Entity<Guest>().HasIndex(p => p.Gwf);
+        b.Entity<Offer>(e =>
+        {
+            e.HasIndex(o => o.SubmissionReference).IsUnique();
+            e.Property(o => o.Status).HasConversion<string>();
+            e.Ignore(o => o.Address);
+        });
         b.Entity<DecisionUpdate>(e =>
         {
             e.HasIndex(u => new { u.IngestRunId, u.RowNumber }).IsUnique();
@@ -74,6 +83,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             e.HasIndex(c => c.MatchKey).IsUnique();
             e.Ignore(c => c.Guests);
             e.HasMany(c => c.Checks).WithOne().HasForeignKey(x => x.CaseId);
+            e.HasOne(c => c.Host).WithMany().HasForeignKey(c => c.HostId);
         });
         b.Entity<Announcement>(e =>
         {

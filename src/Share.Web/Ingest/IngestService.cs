@@ -34,6 +34,8 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
             await IngestApplicationsAsync(run, await File.ReadAllTextAsync(file.Path));
         else if (file.Name.EndsWith("-arrivals.csv"))
             await IngestArrivalsAsync(run, await File.ReadAllTextAsync(file.Path));
+        else if (file.Name.EndsWith("-eoi-offers.json"))
+            await IngestOffersAsync(run, await File.ReadAllTextAsync(file.Path));
         else
             throw new NotSupportedException($"{file.Name} is not a file type we can process yet");
 
@@ -151,6 +153,7 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
 
         var apps = await db.VisaApplications.IgnoreQueryFilters()
             .Include(a => a.Guests).Include(a => a.DecisionUpdates)
+            .AsSplitQuery()
             .ToListAsync();
         var byGwf = new Dictionary<string, VisaApplication>(StringComparer.OrdinalIgnoreCase);
         foreach (var a in apps)
@@ -230,6 +233,41 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
                     CaseId = app.CaseId,
                 });
             }
+        }
+    }
+
+    // Expressions of interest: offers of accommodation with no guest attached.
+    // Idempotent on the submission reference.
+    async Task IngestOffersAsync(IngestRun run, string json)
+    {
+        var parsed = OfferParser.Parse(json);
+        run.RecordsInFile = parsed.Count;
+        run.Added = 0;
+        run.AlreadyPresent = 0;
+        run.SkippedRows.Clear();
+        var known = (await db.Offers.IgnoreQueryFilters().Select(o => o.SubmissionReference).ToListAsync()).ToHashSet();
+        foreach (var p in parsed)
+        {
+            if (p.Offer is null)
+            {
+                run.SkippedRows.Add(new SkippedRow { RowNumber = p.RowNumber, Reference = p.Reference, Reason = p.SkipReason! });
+                continue;
+            }
+            if (!known.Add(p.Offer.SubmissionReference))
+            {
+                run.AlreadyPresent++;
+                continue;
+            }
+            db.Offers.Add(p.Offer);
+            run.Added++;
+            run.Events.Add(new TimelineEvent
+            {
+                Kind = TimelineEventKind.OfferReceived,
+                OccurredAt = p.Offer.SubmittedAt,
+                Title = "Offer of accommodation received",
+                Description = $"{p.Offer.HostName ?? "Someone"} offered {p.Offer.Address}",
+                Offer = p.Offer,
+            });
         }
     }
 }
