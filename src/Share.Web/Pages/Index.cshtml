@@ -1,49 +1,52 @@
 @page
 @model IndexModel
+@inject Share.Web.Users.CurrentUser CurrentUser
 @{ ViewData["Title"] = "Home"; }
 
-@if (Model.Announcements.Count > 0)
-{
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <div class="govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">Announcements</h2>
-                @foreach (var announcement in Model.Announcements)
+<div class="app-welcome">
+    <h1 class="govuk-heading-xl app-welcome__title">Welcome to The Share</h1>
+    <p class="govuk-body-l app-welcome__text">Use this service to record and manage sponsor and guest data relating to the Homes for Ukraine scheme.</p>
+</div>
+
+<div class="govuk-notification-banner app-announcements" role="region" aria-labelledby="announcements-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="announcements-title">Announcements</h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        @if (Model.Announcements.Count == 0)
+        {
+            <p class="govuk-body govuk-!-margin-bottom-0">There are no announcements.</p>
+        }
+        @foreach (var announcement in Model.Announcements)
+        {
+            <div class="app-announcement">
+                <h3 class="govuk-notification-banner__heading">@announcement.Title</h3>
+                <p class="govuk-body">@announcement.Body</p>
+                @if (!string.IsNullOrEmpty(announcement.Link))
                 {
-                    <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="announcement-@announcement.Id">
-                        <div class="govuk-notification-banner__header">
-                            <h3 class="govuk-notification-banner__title" id="announcement-@announcement.Id">
-                                @announcement.Title
-                            </h3>
-                        </div>
-                        <div class="govuk-notification-banner__content">
-                            <p class="govuk-body">@announcement.Body</p>
-                            @if (!string.IsNullOrEmpty(announcement.Link))
-                            {
-                                <p class="govuk-body">
-                                    <a href="@announcement.Link" class="govuk-notification-banner__link">More information</a>
-                                </p>
-                            }
-                        </div>
-                    </div>
+                    <p class="govuk-body"><a href="@announcement.Link" class="govuk-notification-banner__link">More information<span class="govuk-visually-hidden"> about @announcement.Title</span></a></p>
                 }
             </div>
-        </div>
-    </div>
-}
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">The Share</h1>
-        <p class="govuk-body-l">Casework for the Homes for Ukraine programme. Visa applications arrive as files, and councils work them through to safe arrival.</p>
-        <ul class="govuk-list">
-            <li><a class="govuk-link" href="/Cases">Cases</a> (@Model.CaseCount)</li>
-            <li><a class="govuk-link" href="/Applications">Visa applications</a> (@Model.ApplicationCount)</li>
-            <li><a class="govuk-link" href="/Guests">Guests</a> (@Model.GuestCount)</li>
-            <li><a class="govuk-link" href="/Sponsors">Sponsors</a> (@Model.SponsorCount)</li>
-            <li><a class="govuk-link" href="/Hosts">Hosts</a> (@Model.HostCount)</li>
-            <li><a class="govuk-link" href="/Accommodations">Accommodations</a> (@Model.AccommodationCount)</li>
-            <li><a class="govuk-link" href="/Admin">Demo controls</a>: process the next data file or reset the demo</li>
-        </ul>
+        }
     </div>
 </div>
+
+@if (!CurrentUser.User.IsAdmin)
+{
+    <p class="govuk-body">Counts show @Display.Council(CurrentUser.User.Council) records only.</p>
+}
+<ul class="app-tiles" role="list" aria-label="Parts of the service">
+    @foreach (var tile in Model.Tiles)
+    {
+        <li class="app-tile">
+            <h2 class="govuk-heading-m app-tile__title">
+                <a class="govuk-link govuk-link--no-visited-state app-tile__link" href="@tile.Href">@tile.Title</a>
+            </h2>
+            @if (tile.Count is int count)
+            {
+                <p class="govuk-body app-tile__count"><span class="app-tile__number">@count</span> @(count == 1 ? tile.Singular : tile.Plural)</p>
+            }
+            <p class="govuk-body app-tile__description">@tile.Description</p>
+        </li>
+    }
+</ul>

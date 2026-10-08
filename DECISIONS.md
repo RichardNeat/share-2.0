@@ -279,3 +279,17 @@ A running timeline of the major decisions made while building this service, olde
 - **What:** GOV.UK's header container has a clearfix `::after`, which counted as a flex item and pulled the button into the middle; it is switched off for this header
 - **Fix:** the first try showed "This video is unavailable". Testing variants side by side showed YouTube refuses embeds on pages served from a bare IP address (`127.0.0.1`) but plays them on `localhost` and real hostnames. The page now redirects from `127.0.0.1` to `localhost`, CLAUDE.md says to run on `localhost`, and the page has a "Watch it on YouTube instead" link as a fallback
 - **Turned down:** going back to a plain link to YouTube, where the ads and YouTube page would spoil the joke
+
+## 2026-10-08 · Home page
+
+### 50. The home page is a welcome banner, then announcements, then tiles
+
+- **Why:** The team asked for a welcoming front page in that order. Tiles give one obvious way into each part of the service, and their counts follow the signed-in council, so a council user sees their own workload at a glance
+- **What:** The welcome banner is GOV.UK brand blue with white text and holds the page's one h1. Announcements sit in a single standard notification banner (not the green success one, which GOV.UK keeps for confirming an action) and it always shows, saying "There are no announcements" when there are none. Tiles are a list of links; the whole tile is clickable, with the heading link as the one keyboard stop
+- **Turned down:** a GOV.UK panel for the welcome, which is meant for confirmation pages, and hiding the announcements banner when empty, which would make it vanish in the demo
+
+### 51. The "Dev Share" announcement is part of the demo seed, and the tiles lose their heading
+
+- **Why:** An announcement typed in on screen would vanish at the next reset. Putting it in `DemoSeeder` as a scripted action, applied through the same announcement service as the admin page, means it shows on every run
+- **What:** "Dev Share: Built from scratch in one hour" is added after every reset, including "Reset to empty", because an announcement is a message to users, not casework data. The "What do you want to do?" heading is removed at the team's request; each tile title becomes an h2 so headings still go down in order, and the tile list is labelled "Parts of the service" for screen readers
+- **Turned down:** writing the announcement straight into the database, which the reset would clear

@@ -72,3 +72,24 @@
 /* Responsive 16:9 video embed */
 .app-video { position: relative; width: 100%; max-width: 960px; aspect-ratio: 16 / 9; }
 .app-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* Home page: welcome banner (GOV.UK brand blue, white text) */
+.app-welcome { background-color: #1d70b8; color: #ffffff; padding: 30px; margin-bottom: 30px; }
+.app-welcome__title, .app-welcome__text { color: #ffffff; }
+.app-welcome__text { margin-bottom: 0; max-width: 40em; }
+@media (max-width: 40.0625em) { .app-welcome { padding: 20px 15px; } }
+
+/* Home page: announcements, one after another inside the banner */
+.app-announcements { margin-bottom: 40px; }
+.app-announcement + .app-announcement { border-top: 1px solid #b1b4b6; padding-top: 15px; }
+.app-announcement > :last-child { margin-bottom: 0; }
+
+/* Home page: tiles linking to each part of the service. The whole tile is clickable via the link */
+.app-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; list-style: none; margin: 0 0 30px; padding: 0; }
+.app-tile { position: relative; background-color: #f3f2f1; border-top: 5px solid #1d70b8; padding: 20px; }
+.app-tile:hover { background-color: #e8e8e8; }
+.app-tile__title { margin-bottom: 10px; }
+.app-tile__link::after { content: ""; position: absolute; inset: 0; }
+.app-tile__count { margin-bottom: 5px; }
+.app-tile__number { font-weight: 700; font-size: 1.5rem; }
+.app-tile__description { color: #505a5f; margin-bottom: 0; }
