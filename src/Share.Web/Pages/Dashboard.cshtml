@@ -1,0 +1,76 @@
+@page
+@model DashboardModel
+
+@{ ViewData["Title"] = "Dashboard - The Share - GOV.UK"; }
+
+<h1 class="govuk-heading-l">Programme Dashboard</h1>
+
+<div class="govuk-grid-row govuk-!-margin-bottom-9">
+    <div class="govuk-grid-column-one-quarter">
+        <div style="border: 1px solid #b1b4b6; padding: 1.5rem; text-align: center;">
+            <p class="govuk-body-s" style="color: #626a6e;">Cases needing checks</p>
+            <p class="govuk-heading-l" style="margin: 0;">@Model.CasesNeedingChecks</p>
+        </div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div style="border: 1px solid #b1b4b6; padding: 1.5rem; text-align: center;">
+            <p class="govuk-body-s" style="color: #626a6e;">Recent arrivals</p>
+            <p class="govuk-heading-l" style="margin: 0;">@Model.RecentArrivals</p>
+        </div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div style="border: 1px solid #b1b4b6; padding: 1.5rem; text-align: center;">
+            <p class="govuk-body-s" style="color: #626a6e;">Total cases</p>
+            <p class="govuk-heading-l" style="margin: 0;">@Model.TotalCases</p>
+        </div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div style="border: 1px solid #b1b4b6; padding: 1.5rem; text-align: center;">
+            <p class="govuk-body-s" style="color: #626a6e;">Checks complete</p>
+            <p class="govuk-heading-l" style="margin: 0;">@Model.CasesWithAllChecksPassed</p>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Cases by council</h2>
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Council</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Count</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach (var council in Model.CasesByCouncil)
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@council.Key</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@council.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Applications by status</h2>
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Status</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Count</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach (var status in Model.ApplicationsByStatus.OrderByDescending(x => x.Value))
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@status.Key</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@status.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
