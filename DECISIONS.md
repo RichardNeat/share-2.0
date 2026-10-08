@@ -260,3 +260,11 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** The notifications (M21) and announcements (M24) pull requests each added a migration but not the matching model snapshot change. EF then reported "pending model changes" at startup and every journey test failed, on main as well as here
 - **What:** The snapshot now includes both tables. No new migration: the M21 and M24 migrations already create exactly those tables and indexes, so a new one would try to create them twice. A teammate made the same fix on main at the same time; the two merged cleanly into one snapshot
+
+## 2026-10-08 · Fixes after merging M21
+
+### 48. Fix structural problems on the merged notifications page (M21 groundwork), leaving its TODOs alone
+
+- **Why:** Once M21 was merged, the team asked for the page to be fixed. It wrapped itself in a second `<main>` inside the layout's, set its title to "Notifications - The Share - GOV.UK" (so the layout added the suffix again), and its banner had a header but no content
+- **What:** One `<main>` (from the layout), the title "Notifications", and a standard "Important" notification banner holding the unread count. The unfinished parts (notification list, mark as read, the bell partial, the current user) stay as the M21 team left them
+- **Guard:** the shared accessibility test now fails any page with more than one `<main>` or a doubled title, and covers the Notifications and Announcements pages

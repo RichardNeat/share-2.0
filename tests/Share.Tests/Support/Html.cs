@@ -40,6 +40,8 @@ public static class Html
         Assert.Single(doc.QuerySelectorAll("h1"));
         Assert.NotNull(doc.QuerySelector("a.govuk-skip-link[href='#main-content']"));
         Assert.NotNull(doc.QuerySelector("main#main-content"));
+        Assert.Single(doc.QuerySelectorAll("main"));
+        Assert.DoesNotContain("GOV.UK - The Share", doc.Title);
         foreach (var field in doc.QuerySelectorAll("input:not([type=hidden]), select, textarea"))
         {
             var id = field.Id;
