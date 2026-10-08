@@ -22,7 +22,7 @@ public class HomePageJourneyTests : IClassFixture<AppFactory>
         Html.AssertAccessible(home);
 
         var welcome = home.QuerySelector("main .app-welcome")!;
-        Assert.Equal("Welcome to The Share", Text(welcome.QuerySelector("h1")));
+        Assert.Equal("Welcome to Share", Text(welcome.QuerySelector("h1")));
         Assert.Equal("Use this service to record and manage sponsor and guest data relating to the Homes for Ukraine scheme.", Text(welcome.QuerySelector("p")));
 
         var announcements = home.QuerySelector("main .govuk-notification-banner")!;
