@@ -1,0 +1,16 @@
+@page "/do-not-press"
+@model Share.Web.Pages.DoNotPressModel
+@{ ViewData["Title"] = "We told you not to press it"; }
+@section BeforeContent {
+    <a href="/" class="govuk-back-link">Back to safety</a>
+}
+<h1 class="govuk-heading-l">We told you not to press it</h1>
+<div class="app-video">
+    @* YouTube's privacy-enhanced embed: no YouTube page around it. YouTube may still play an ad first. *@
+    <iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0"
+            title="Rick Astley, Never Gonna Give You Up (video)"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+</div>
+<p class="govuk-body govuk-!-margin-top-4">Captions are available from the player's settings. Video not playing? <a class="govuk-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Watch it on YouTube instead</a>.</p>

@@ -268,3 +268,14 @@ A running timeline of the major decisions made while building this service, olde
 - **Why:** Once M21 was merged, the team asked for the page to be fixed. It wrapped itself in a second `<main>` inside the layout's, set its title to "Notifications - The Share - GOV.UK" (so the layout added the suffix again), and its banner had a header but no content
 - **What:** One `<main>` (from the layout), the title "Notifications", and a standard "Important" notification banner holding the unread count. The unfinished parts (notification list, mark as read, the bell partial, the current user) stay as the M21 team left them
 - **Guard:** the shared accessibility test now fails any page with more than one `<main>` or a doubled title, and covers the Notifications and Announcements pages
+
+## 2026-10-08 · Demo extras
+
+### 49. A "Do not press" button in the header (a rickroll)
+
+- **Why:** The team wanted a joke for the demo
+- **What:** A link styled as GOV.UK's red warning button, on the right of the header. It stays a plain link, not `role="button"`: it takes you somewhere, and without JavaScript the Space key wouldn't work on a link pretending to be a button. On a phone it drops below the logo at full width. It uses GOV.UK's yellow focus style and is reached by keyboard straight after the logo
+- **What:** It goes to our own page, `/do-not-press` ("We told you not to press it"), which embeds the video with YouTube's privacy-enhanced player (`youtube-nocookie.com`, autoplay, no related videos) and a titled `iframe`. The team didn't want a link to YouTube itself, where ads and the YouTube page would spoil the joke. YouTube may still play an ad before an embedded video; hosting the file ourselves would avoid that, but we don't have the rights
+- **What:** GOV.UK's header container has a clearfix `::after`, which counted as a flex item and pulled the button into the middle; it is switched off for this header
+- **Fix:** the first try showed "This video is unavailable". Testing variants side by side showed YouTube refuses embeds on pages served from a bare IP address (`127.0.0.1`) but plays them on `localhost` and real hostnames. The page now redirects from `127.0.0.1` to `localhost`, CLAUDE.md says to run on `localhost`, and the page has a "Watch it on YouTube instead" link as a fallback
+- **Turned down:** going back to a plain link to YouTube, where the ads and YouTube page would spoil the joke

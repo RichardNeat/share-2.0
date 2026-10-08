@@ -91,6 +91,7 @@ public class ApplicationsJourneyTests : IClassFixture<AppFactory>
     [InlineData("/Applications")]
     [InlineData("/Admin")]
     [InlineData("/Accessibility")]
+    [InlineData("/do-not-press")]
     [InlineData("/Notifications")]
     [InlineData("/Admin/Announcements")]
     [InlineData("/Admin/Announcements/Create")]

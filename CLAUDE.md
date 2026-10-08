@@ -24,7 +24,7 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 - .NET 10, ASP.NET Core **Razor Pages** (server-rendered, no separate front end)
 - **EF Core with SQLite** (`Data Source=app.db`), code-first models and migrations
 - **GOV.UK Frontend** CSS from `https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.css` in the shared layout, replacing the template's Bootstrap. Use GOV.UK classes and components (tags for statuses, summary lists, tables) consistently
-- Plain HTTP only: remove `app.UseHttpsRedirection()` and run with `dotnet run --urls http://127.0.0.1:5050`
+- Plain HTTP only: remove `app.UseHttpsRedirection()` and run with `dotnet run --urls http://localhost:5050` (use `localhost`, not `127.0.0.1`: YouTube refuses embedded videos on bare IP addresses)
 - Ingest is a repeatable **"process next file"** action: a button on an admin page (best for the live demo) backed by a service class, idempotent, logging skipped rows. Each run is stored as an `IngestRun` (file, counts, skipped rows with reasons); see the demo plan below
 
 ## Known gotchas (found while proving the stack)
