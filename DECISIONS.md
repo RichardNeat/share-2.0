@@ -322,3 +322,12 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** M5 says both feed types should replay in number order. Files 03 to 06 are visa applications and arrivals only, and ingest cleanly: 20 applications, 15 cases and 19 decision updates, with one deliberately unmatched row
 - **Open:** file 07 is the first offers-of-accommodation file. "Process next file" stops there with a clear message until offers are built (M12), so files 08 onwards wait too
+
+## 2026-10-08 · Case page side navigation
+
+### 57. The case page has a side navigation with its sections and the actions you can take now
+
+- **Why:** The case page grew to five sections. The team asked for accessible side navigation, including links to each action flow
+- **What:** On the left, in the shape of the MOJ side navigation: "Case sections" (summary, safeguarding checks, guests, visa applications, case history) jump to headings on the same page, and "Actions" links to each flow ("Update check 1: accommodation exists", "Record arrival" while check 4 is locked, "Change arrival date" once recorded). It is a `<nav aria-label="Case">` landmark with real links and descriptive link text. It sticks while scrolling on wider screens (CSS `position: sticky`) and sits above the content on a phone. No JavaScript
+- **Turned down:** GOV.UK tabs, which need JavaScript (we use none) and would hide most of the case during the demo. Also turned down: a separate page per section, which would let the navigation show where you are but costs a click per view. Worth revisiting if the case page keeps growing
+- **Bug caught by a test:** lower-casing check names for link text turned "DBS" into "dBS"; acronyms now keep their capitals

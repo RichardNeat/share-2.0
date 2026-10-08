@@ -14,164 +14,172 @@
 <span class="govuk-caption-l">Case @c.Reference</span>
 <h1 class="govuk-heading-l">@c.Title</h1>
 
-<dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Status</dt><dd class="govuk-summary-list__value">
-            <partial name="_CaseStatusTag" model="Model.Assessment.Status" />
-            @if (Model.Assessment.EnhancedDbsRequired) { <partial name="_EnhancedDbsTag" /> }
-        </dd></div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(c.Council)</dd></div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Sponsor</dt>
-        <dd class="govuk-summary-list__value">
-            @if (c.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
-            }
-        </dd>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+        <partial name="_CaseSideNav" model="Model" />
     </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Host@(hosts.Count > 1 ? "s" : "")</dt>
-        <dd class="govuk-summary-list__value">
-            @if (hosts.Count == 0) { @:Not given
-            }
-            else
-            {
-                <ul class="govuk-list">
-                    @foreach (var h in hosts) { <li><a class="govuk-link" href="/People/@h.Id">@h.FullName</a></li> }
-                </ul>
-            }
-        </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Accommodation</dt>
-        <dd class="govuk-summary-list__value">
-            @if (c.Accommodation is { } a) { <a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a>@(string.IsNullOrEmpty(a.Postcode) ? "" : $", {a.Postcode}") } else { @:Not given
-            }
-        </dd>
-    </div>
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">People</dt><dd class="govuk-summary-list__value">@guests.Count</dd></div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Youngest guest</dt>
-        <dd class="govuk-summary-list__value">
-            @if (youngest is null) { @:Not given
-            }
-            else
-            {
-                <a class="govuk-link" href="/Guests/@youngest.Id">@youngest.FullName</a>@:, aged @Ages.On(youngest.DateOfBirth!.Value, Model.Today) (born @Display.Date(youngest.DateOfBirth))
-            }
-        </dd>
-    </div>
-</dl>
+    <div class="govuk-grid-column-three-quarters">
+        <h2 class="govuk-heading-m" id="summary">Case summary</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Status</dt><dd class="govuk-summary-list__value">
+                    <partial name="_CaseStatusTag" model="Model.Assessment.Status" />
+                    @if (Model.Assessment.EnhancedDbsRequired) { <partial name="_EnhancedDbsTag" /> }
+                </dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(c.Council)</dd></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Sponsor</dt>
+                <dd class="govuk-summary-list__value">
+                    @if (c.Sponsor is { } s) { <a class="govuk-link" href="/People/@s.Id">@s.FullName</a> } else { @:Not given
+                    }
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Host@(hosts.Count > 1 ? "s" : "")</dt>
+                <dd class="govuk-summary-list__value">
+                    @if (hosts.Count == 0) { @:Not given
+                    }
+                    else
+                    {
+                        <ul class="govuk-list">
+                            @foreach (var h in hosts) { <li><a class="govuk-link" href="/People/@h.Id">@h.FullName</a></li> }
+                        </ul>
+                    }
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Accommodation</dt>
+                <dd class="govuk-summary-list__value">
+                    @if (c.Accommodation is { } a) { <a class="govuk-link" href="/Accommodations/@a.Id">@a.Address</a>@(string.IsNullOrEmpty(a.Postcode) ? "" : $", {a.Postcode}") } else { @:Not given
+                    }
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">People</dt><dd class="govuk-summary-list__value">@guests.Count</dd></div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Youngest guest</dt>
+                <dd class="govuk-summary-list__value">
+                    @if (youngest is null) { @:Not given
+                    }
+                    else
+                    {
+                        <a class="govuk-link" href="/Guests/@youngest.Id">@youngest.FullName</a>@:, aged @Ages.On(youngest.DateOfBirth!.Value, Model.Today) (born @Display.Date(youngest.DateOfBirth))
+                    }
+                </dd>
+            </div>
+        </dl>
 
-<h2 class="govuk-heading-m" id="checks">Safeguarding checks</h2>
-@if (Model.Assessment.EnhancedDbsRequired)
-{
-    <div class="govuk-warning-text">
-        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-        <strong class="govuk-warning-text__text">
-            <span class="govuk-visually-hidden">Warning</span>
-            Enhanced DBS required. This case has a guest under 18:
-            @string.Join(", ", Model.Assessment.Children.Select(g => $"{g.FullName} ({Ages.On(g.DateOfBirth!.Value, Model.Today)})")).
-            The DBS check must be an Enhanced DBS. A standard DBS does not complete it.
-        </strong>
-    </div>
-}
-<dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    @foreach (var check in Model.Assessment.Checks)
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">@((int)check.Kind). @Display.CheckName(check.Kind)</dt>
-            <dd class="govuk-summary-list__value">
-                @if (check.Locked)
-                {
-                    <partial name="_CheckStatusTag" model="check.Recorded" />
-                    <p class="govuk-body-s app-secondary-text">Available when guests arrive. This opens automatically when the Home Office arrivals feed shows them landing, or you can record the arrival.</p>
-                }
-                else
-                {
-                    <partial name="_CheckStatusTag" model="check.Effective" />
-                    @if (check.DbsType is { } dbs)
-                    {
-                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@Display.DbsTypeName(dbs)</p>
-                    }
-                    @if (check.FailureReason is { } reason)
-                    {
-                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Reason: @reason</p>
-                    }
-                    @if (check.Note is { } note)
-                    {
-                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><strong>@note</strong></p>
-                    }
-                    @if (check.Kind == CheckKind.GuestsArrived)
-                    {
-                        foreach (var arrival in c.Applications.Select(a => (App: a, Arrival: a.LatestArrival)).Where(x => x.Arrival != null))
-                        {
-                            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@arrival.App.Lead?.FullName arrived in the UK at @Ports.Name(arrival.Arrival!.ArrivalPort) on @Display.DateTime(arrival.Arrival.ArrivedAt!.Value) (Home Office arrivals feed)</p>
-                        }
-                    }
-                    @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is { } arrived)
-                    {
-                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Guests arrived on @Display.Date(arrived) (recorded by a caseworker)</p>
-                    }
-                }
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                @if (check.Locked)
-                {
-                    <a class="govuk-link" href="/Cases/@c.Id/Arrival">Record arrival<span class="govuk-visually-hidden"> of the guests</span></a>
-                }
-                else
-                {
-                    <ul class="govuk-summary-list__actions-list">
-                        <li class="govuk-summary-list__actions-list-item">
-                            <a class="govuk-link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update<span class="govuk-visually-hidden"> @Display.CheckName(check.Kind).ToLowerInvariant()</span></a>
-                        </li>
-                        @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is not null)
-                        {
-                            <li class="govuk-summary-list__actions-list-item">
-                                <a class="govuk-link" href="/Cases/@c.Id/Arrival">Change arrival date</a>
-                            </li>
-                        }
-                    </ul>
-                }
-            </dd>
-        </div>
-    }
-</dl>
-
-<h2 class="govuk-heading-m">Guests (@guests.Count)</h2>
-<div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="case-guests-caption">
-<table class="govuk-table">
-    <caption id="case-guests-caption" class="govuk-table__caption govuk-visually-hidden">Guests on this case</caption>
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Name</th>
-            <th scope="col" class="govuk-table__header">Date of birth</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Age</th>
-            <th scope="col" class="govuk-table__header">On the application as</th>
-            <th scope="col" class="govuk-table__header">Visa status</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        @foreach (var g in guests)
+        <h2 class="govuk-heading-m" id="checks">Safeguarding checks</h2>
+        @if (Model.Assessment.EnhancedDbsRequired)
         {
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a></td>
-                <td class="govuk-table__cell">@Display.Date(g.DateOfBirth)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric">@Display.Age(g.DateOfBirth, Model.Today)</td>
-                <td class="govuk-table__cell">@(g.IsLead ? "Lead applicant" : "Family member")</td>
-                <td class="govuk-table__cell"><partial name="_VisaStatusTag" model="g.VisaApplication!.Status" /></td>
-            </tr>
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">Warning</span>
+                    Enhanced DBS required. This case has a guest under 18:
+                    @string.Join(", ", Model.Assessment.Children.Select(g => $"{g.FullName} ({Ages.On(g.DateOfBirth!.Value, Model.Today)})")).
+                    The DBS check must be an Enhanced DBS. A standard DBS does not complete it.
+                </strong>
+            </div>
         }
-    </tbody>
-</table>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            @foreach (var check in Model.Assessment.Checks)
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">@((int)check.Kind). @Display.CheckName(check.Kind)</dt>
+                    <dd class="govuk-summary-list__value">
+                        @if (check.Locked)
+                        {
+                            <partial name="_CheckStatusTag" model="check.Recorded" />
+                            <p class="govuk-body-s app-secondary-text">Available when guests arrive. This opens automatically when the Home Office arrivals feed shows them landing, or you can record the arrival.</p>
+                        }
+                        else
+                        {
+                            <partial name="_CheckStatusTag" model="check.Effective" />
+                            @if (check.DbsType is { } dbs)
+                            {
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@Display.DbsTypeName(dbs)</p>
+                            }
+                            @if (check.FailureReason is { } reason)
+                            {
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Reason: @reason</p>
+                            }
+                            @if (check.Note is { } note)
+                            {
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><strong>@note</strong></p>
+                            }
+                            @if (check.Kind == CheckKind.GuestsArrived)
+                            {
+                                foreach (var arrival in c.Applications.Select(a => (App: a, Arrival: a.LatestArrival)).Where(x => x.Arrival != null))
+                                {
+                                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@arrival.App.Lead?.FullName arrived in the UK at @Ports.Name(arrival.Arrival!.ArrivalPort) on @Display.DateTime(arrival.Arrival.ArrivedAt!.Value) (Home Office arrivals feed)</p>
+                                }
+                            }
+                            @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is { } arrived)
+                            {
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Guests arrived on @Display.Date(arrived) (recorded by a caseworker)</p>
+                            }
+                        }
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        @if (check.Locked)
+                        {
+                            <a class="govuk-link" href="/Cases/@c.Id/Arrival">Record arrival<span class="govuk-visually-hidden"> of the guests</span></a>
+                        }
+                        else
+                        {
+                            <ul class="govuk-summary-list__actions-list">
+                                <li class="govuk-summary-list__actions-list-item">
+                                    <a class="govuk-link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update<span class="govuk-visually-hidden"> @Display.CheckName(check.Kind).ToLowerInvariant()</span></a>
+                                </li>
+                                @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is not null)
+                                {
+                                    <li class="govuk-summary-list__actions-list-item">
+                                        <a class="govuk-link" href="/Cases/@c.Id/Arrival">Change arrival date</a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </dd>
+                </div>
+            }
+        </dl>
+
+        <h2 class="govuk-heading-m" id="guests">Guests (@guests.Count)</h2>
+        <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="case-guests-caption">
+        <table class="govuk-table">
+            <caption id="case-guests-caption" class="govuk-table__caption govuk-visually-hidden">Guests on this case</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Name</th>
+                    <th scope="col" class="govuk-table__header">Date of birth</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Age</th>
+                    <th scope="col" class="govuk-table__header">On the application as</th>
+                    <th scope="col" class="govuk-table__header">Visa status</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach (var g in guests)
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a></td>
+                        <td class="govuk-table__cell">@Display.Date(g.DateOfBirth)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Display.Age(g.DateOfBirth, Model.Today)</td>
+                        <td class="govuk-table__cell">@(g.IsLead ? "Lead applicant" : "Family member")</td>
+                        <td class="govuk-table__cell"><partial name="_VisaStatusTag" model="g.VisaApplication!.Status" /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </div>
+
+        <h2 class="govuk-heading-m" id="applications">Visa applications (@c.Applications.Count)</h2>
+        <ul class="govuk-list">
+            @foreach (var app in c.Applications.OrderBy(a => a.SubmittedAt).ThenBy(a => a.Id))
+            {
+                <li><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a> – @app.Lead?.FullName, submitted @Display.DateTime(app.SubmittedAt) <partial name="_VisaStatusTag" model="app.Status" /></li>
+            }
+        </ul>
+
+        <h2 class="govuk-heading-m" id="history">Case history</h2>
+        <partial name="_Timeline" model="Model.Timeline" />
+    </div>
 </div>
-
-<h2 class="govuk-heading-m">Visa applications (@c.Applications.Count)</h2>
-<ul class="govuk-list">
-    @foreach (var app in c.Applications.OrderBy(a => a.SubmittedAt).ThenBy(a => a.Id))
-    {
-        <li><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a> – @app.Lead?.FullName, submitted @Display.DateTime(app.SubmittedAt) <partial name="_VisaStatusTag" model="app.Status" /></li>
-    }
-</ul>
-
-<h2 class="govuk-heading-m" id="history">Case history</h2>
-<partial name="_Timeline" model="Model.Timeline" />

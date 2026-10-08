@@ -101,3 +101,14 @@
 .app-timeline__title { margin-bottom: 5px; }
 .app-timeline__date { margin-bottom: 5px; color: #505a5f; }
 .app-timeline__description { margin-bottom: 0; }
+
+/* Case side navigation (shape of the MOJ side navigation). Sticks while the page scrolls on wider screens. */
+.app-side-nav { margin-bottom: 30px; }
+.app-side-nav__heading { margin-bottom: 10px; color: #505a5f; }
+.app-side-nav__list { list-style: none; margin: 0 0 25px; padding: 0; }
+.app-side-nav__item { margin: 0; }
+.app-side-nav__link { display: block; padding: 8px 0 8px 12px; border-left: 4px solid #b1b4b6; font-size: 1rem; line-height: 1.25; }
+.app-side-nav__link:hover { border-left-color: #1d70b8; }
+@media (min-width: 40.0625em) {
+    .app-side-nav { position: sticky; top: 20px; }
+}

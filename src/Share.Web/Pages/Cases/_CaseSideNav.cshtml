@@ -1,0 +1,47 @@
+@* Side navigation for a case, in the shape of the MOJ side navigation: plain links, no JavaScript.
+   Sections jump to headings on this page; actions go to each flow and only show what can be done now. *@
+@model Share.Web.Pages.Cases.DetailsModel
+@{
+    var c = Model.Case;
+    var guestCount = c.Guests.Count();
+    var sections = new (string Id, string Text)[]
+    {
+        ("summary", "Case summary"),
+        ("checks", "Safeguarding checks"),
+        ("guests", $"Guests ({guestCount})"),
+        ("applications", $"Visa applications ({c.Applications.Count})"),
+        ("history", "Case history"),
+    };
+}
+<nav class="app-side-nav" aria-label="Case">
+    <h2 class="govuk-heading-s app-side-nav__heading">Case sections</h2>
+    <ul class="app-side-nav__list">
+        @foreach (var (id, text) in sections)
+        {
+            <li class="app-side-nav__item"><a class="govuk-link govuk-link--no-visited-state app-side-nav__link" href="#@id">@text</a></li>
+        }
+    </ul>
+
+    <h2 class="govuk-heading-s app-side-nav__heading">Actions</h2>
+    <ul class="app-side-nav__list">
+        @foreach (var check in Model.Assessment.Checks)
+        {
+            var name = Display.CheckName(check.Kind);
+            // Lower-case the first word unless it is an acronym (DBS).
+            var first = name.Length > 1 && char.IsUpper(name[1]) ? name : $"{char.ToLowerInvariant(name[0])}{name[1..]}";
+            var label = $"check {(int)check.Kind}: {first}";
+            if (check.Locked)
+            {
+                <li class="app-side-nav__item"><a class="govuk-link govuk-link--no-visited-state app-side-nav__link" href="/Cases/@c.Id/Arrival">Record arrival</a></li>
+            }
+            else
+            {
+                <li class="app-side-nav__item"><a class="govuk-link govuk-link--no-visited-state app-side-nav__link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update @label</a></li>
+            }
+        }
+        @if (c.ArrivalRecordedOn is not null)
+        {
+            <li class="app-side-nav__item"><a class="govuk-link govuk-link--no-visited-state app-side-nav__link" href="/Cases/@c.Id/Arrival">Change arrival date</a></li>
+        }
+    </ul>
+</nav>
