@@ -1,6 +1,37 @@
 @page
 @model IndexModel
 @{ ViewData["Title"] = "Home"; }
+
+@if (Model.Announcements.Count > 0)
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-!-margin-bottom-6">
+                <h2 class="govuk-heading-m">Announcements</h2>
+                @foreach (var announcement in Model.Announcements)
+                {
+                    <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="announcement-@announcement.Id">
+                        <div class="govuk-notification-banner__header">
+                            <h3 class="govuk-notification-banner__title" id="announcement-@announcement.Id">
+                                @announcement.Title
+                            </h3>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-body">@announcement.Body</p>
+                            @if (!string.IsNullOrEmpty(announcement.Link))
+                            {
+                                <p class="govuk-body">
+                                    <a href="@announcement.Link" class="govuk-notification-banner__link">More information</a>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">The Share</h1>
