@@ -80,6 +80,9 @@
             @(Model.IsFlipped ? "✓ Page flipped" : "Page flip")
         </button>
     </form>
+    <form method="post" asp-page-handler="CheckDataIntegrity" style="display: inline;">
+        <button type="submit" class="govuk-button govuk-button--secondary">Check data integrity</button>
+    </form>
 </div>
 
 <h2 class="govuk-heading-m">Service administration</h2>
