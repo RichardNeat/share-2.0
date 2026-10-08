@@ -1,0 +1,42 @@
+@page "/Applications/{id:int}"
+@model Share.Web.Pages.Applications.DetailsModel
+@{
+    var a = Model.Application;
+    ViewData["Title"] = $"{a.Lead?.FullName} – visa application";
+}
+@section BeforeContent {
+    <a href="/Applications" class="govuk-back-link">Back to applications</a>
+}
+<span class="govuk-caption-l">Visa application @a.Uan</span>
+<h1 class="govuk-heading-l">@a.Lead?.FullName</h1>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa status</dt><dd class="govuk-summary-list__value"><partial name="_VisaStatusTag" model="a.Status" /></dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">UAN</dt><dd class="govuk-summary-list__value">@a.Uan</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">GWF number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.Gwf)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Submitted</dt><dd class="govuk-summary-list__value">@Display.DateTime(a.SubmittedAt)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Sponsor</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.SponsorName)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(a.Council)</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">People on this application</dt><dd class="govuk-summary-list__value">@a.People.Count</dd></div>
+</dl>
+
+<h2 class="govuk-heading-l">Answers</h2>
+@foreach (var person in a.People.OrderBy(p => p.Position))
+{
+    <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+            <h3 class="govuk-summary-card__title">@person.FullName <span class="govuk-!-font-weight-regular">(@(person.IsLead ? "lead applicant" : "family member"))</span></h3>
+        </div>
+        <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+                @foreach (var answer in person.Answers.OrderBy(x => x.Position))
+                {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">@answer.Title</dt>
+                        <dd class="govuk-summary-list__value">@Display.OrNotGiven(answer.Answer)</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+    </div>
+}

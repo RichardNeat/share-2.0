@@ -1,0 +1,59 @@
+@page
+@model Share.Web.Pages.Applications.IndexModel
+@{ ViewData["Title"] = "Visa applications"; }
+<h1 class="govuk-heading-l">Visa applications</h1>
+
+<form method="get" class="govuk-!-margin-bottom-6" novalidate>
+    <div class="govuk-form-group govuk-!-display-inline-block govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+        <label class="govuk-label" for="status">Visa status</label>
+        <select class="govuk-select" id="status" name="status">
+            <option value="">All statuses</option>
+            @foreach (var s in Enum.GetValues<VisaStatus>())
+            {
+                <option value="@s" selected="@(Model.Status == s)">@Display.VisaStatusTag(s).Text</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">Filter</button>
+</form>
+
+@if (Model.Applications.Count == 0)
+{
+    if (Model.Status is null)
+    {
+        <p class="govuk-body">No applications yet. Process a data file from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+    }
+    else
+    {
+        <p class="govuk-body">No applications with status @Display.VisaStatusTag(Model.Status.Value).Text.</p>
+    }
+}
+else
+{
+    <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">@Model.Applications.Count application@(Model.Applications.Count == 1 ? "" : "s")@(Model.Status is null ? "" : $" with status {Display.VisaStatusTag(Model.Status.Value).Text}")</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Applicant</th>
+                <th scope="col" class="govuk-table__header">UAN</th>
+                <th scope="col" class="govuk-table__header">People</th>
+                <th scope="col" class="govuk-table__header">Sponsor</th>
+                <th scope="col" class="govuk-table__header">Council</th>
+                <th scope="col" class="govuk-table__header">Visa status</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var a in Model.Applications)
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/Applications/@a.Id">@a.Lead?.FullName</a></td>
+                    <td class="govuk-table__cell">@a.Uan</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@a.People.Count</td>
+                    <td class="govuk-table__cell">@Display.OrNotGiven(a.SponsorName)</td>
+                    <td class="govuk-table__cell">@Display.Council(a.Council)</td>
+                    <td class="govuk-table__cell"><partial name="_VisaStatusTag" model="a.Status" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

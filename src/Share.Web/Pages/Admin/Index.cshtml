@@ -1,0 +1,74 @@
+@page
+@model Share.Web.Pages.Admin.IndexModel
+@{ ViewData["Title"] = "Demo controls"; }
+<partial name="_SuccessBanner" model="Model.Message" />
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div role="alert">
+            <h2 class="govuk-error-summary__title">There is a problem</h2>
+            <div class="govuk-error-summary__body"><p class="govuk-body govuk-!-margin-bottom-0">@Model.Error</p></div>
+        </div>
+    </div>
+}
+<h1 class="govuk-heading-l">Demo controls</h1>
+
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Files processed</dt><dd class="govuk-summary-list__value">@Model.Runs.Count of @Model.Files.Count</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Next file</dt><dd class="govuk-summary-list__value">@(Model.NextFile?.Name ?? "All files processed")</dd></div>
+</dl>
+
+<form method="post" asp-page-handler="ProcessNext">
+    <button type="submit" class="govuk-button" data-module="govuk-button" disabled="@(Model.NextFile is null)">Process next file</button>
+</form>
+
+<h2 class="govuk-heading-m">Reset the demo</h2>
+<p class="govuk-body">Resetting replays the data files in number order, so the demo comes out the same every time. Anything entered on screen is cleared.</p>
+<form method="post" asp-page-handler="Seed" novalidate>
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="through">Load files through</label>
+        <select class="govuk-select" id="through" name="through">
+            @foreach (var f in Model.Files)
+            {
+                <option value="@f.Number" selected="@(f == Model.Files[^1])">@f.Name</option>
+            }
+        </select>
+    </div>
+    <div class="govuk-button-group">
+        <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">Reset and load</button>
+    </div>
+</form>
+<form method="post" asp-page-handler="Reset">
+    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Reset to empty</button>
+</form>
+
+<h2 class="govuk-heading-m">Ingest history</h2>
+@if (Model.Runs.Count == 0)
+{
+    <p class="govuk-body">No files processed yet.</p>
+}
+else
+{
+    <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-visually-hidden">Files processed, in order</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">File</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Records</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Added</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Skipped</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var r in Model.Runs)
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/Admin/Ingests/@r.Id">@r.FileName</a></td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@r.RecordsInFile</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@r.Added</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@r.SkippedRows.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

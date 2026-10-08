@@ -1,0 +1,73 @@
+@page "/Admin/Ingests/{id:int}"
+@model Share.Web.Pages.Admin.Ingests.DetailsModel
+@{
+    var r = Model.Run;
+    ViewData["Title"] = $"{r.FileName} – ingest";
+}
+@section BeforeContent {
+    <a href="/Admin" class="govuk-back-link">Back to demo controls</a>
+}
+<partial name="_SuccessBanner" model="@(Model.Processed ? $"{r.FileName} processed" : null)" />
+<span class="govuk-caption-l">What just happened</span>
+<h1 class="govuk-heading-l">@r.FileName</h1>
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Records in file</dt><dd class="govuk-summary-list__value">@r.RecordsInFile</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Applications added</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Already ingested</dt><dd class="govuk-summary-list__value">@r.AlreadyPresent</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Rows skipped</dt><dd class="govuk-summary-list__value">@r.SkippedRows.Count</dd></div>
+</dl>
+
+<h2 class="govuk-heading-m">What changed</h2>
+@if (Model.Events.Count == 0)
+{
+    <p class="govuk-body">Nothing changed.</p>
+}
+else
+{
+    <ul class="govuk-list govuk-list--spaced">
+        @foreach (var e in Model.Events)
+        {
+            <li>
+                <strong>@e.Title:</strong>
+                @if (e.VisaApplicationId is int appId)
+                {
+                    <a class="govuk-link" href="/Applications/@appId">@e.Description</a>
+                }
+                else
+                {
+                    @e.Description
+                }
+            </li>
+        }
+    </ul>
+}
+
+<h2 class="govuk-heading-m">Skipped rows</h2>
+@if (r.SkippedRows.Count == 0)
+{
+    <p class="govuk-body">No rows were skipped.</p>
+}
+else
+{
+    <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-visually-hidden">Rows skipped and why</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Row</th>
+                <th scope="col" class="govuk-table__header">Reference</th>
+                <th scope="col" class="govuk-table__header">Reason</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var s in r.SkippedRows.OrderBy(x => x.RowNumber))
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">@s.RowNumber</td>
+                    <td class="govuk-table__cell">@Display.OrNotGiven(s.Reference)</td>
+                    <td class="govuk-table__cell">@s.Reason</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

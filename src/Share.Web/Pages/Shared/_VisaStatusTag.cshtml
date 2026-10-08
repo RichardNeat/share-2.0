@@ -1,0 +1,3 @@
+@model VisaStatus
+@{ var (text, css) = Display.VisaStatusTag(Model); }
+<strong class="govuk-tag @css">@text</strong>

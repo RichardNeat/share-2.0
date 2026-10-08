@@ -1,0 +1,76 @@
+@{
+    var path = Context.Request.Path.Value ?? "/";
+    bool Active(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0c0c" />
+    <title>@ViewData["Title"] - Share - GOV.UK</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="govuk-template__body">
+    <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+    <header class="govuk-header app-header" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="/" class="govuk-header__link govuk-header__link--homepage app-header__logo-link">
+                    <img src="~/images/the-share-logo.png" alt="The Share home" class="app-header__logo" width="72" height="72" />
+                </a>
+            </div>
+        </div>
+    </header>
+    <section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
+        <div class="govuk-width-container">
+            <div class="govuk-service-navigation__container">
+                <span class="govuk-service-navigation__service-name">
+                    <a href="/" class="govuk-service-navigation__link">Share</a>
+                </span>
+                <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
+                    <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden>Menu</button>
+                    <ul class="govuk-service-navigation__list" id="navigation">
+                        <li class="govuk-service-navigation__item @(Active("/Applications") ? "govuk-service-navigation__item--active" : "")">
+                            <a class="govuk-service-navigation__link" href="/Applications" @(Active("/Applications") ? "aria-current=page" : "")>Applications</a>
+                        </li>
+                        <li class="govuk-service-navigation__item @(Active("/Admin") ? "govuk-service-navigation__item--active" : "")">
+                            <a class="govuk-service-navigation__link" href="/Admin" @(Active("/Admin") ? "aria-current=page" : "")>Demo controls</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <div class="govuk-width-container">
+        <div class="govuk-phase-banner">
+            <p class="govuk-phase-banner__content">
+                <strong class="govuk-tag govuk-phase-banner__content__tag">Alpha</strong>
+                <span class="govuk-phase-banner__text">This is a hackathon rebuild. All data is synthetic.</span>
+            </p>
+        </div>
+        @await RenderSectionAsync("BeforeContent", required: false)
+        <main class="govuk-main-wrapper" id="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="govuk-footer">
+        <div class="govuk-width-container">
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <p class="govuk-body-s govuk-!-margin-bottom-0">Homes for Ukraine casework. Hackathon 2026. Every name and record is invented.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script type="module">
+        import { initAll } from 'https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.js';
+        initAll();
+    </script>
+</body>
+</html>
