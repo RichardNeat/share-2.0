@@ -9,9 +9,9 @@
 }
 else
 {
-    <div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="cases-caption">
     <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">@Model.Cases.Count case@(Model.Cases.Count == 1 ? "" : "s")</caption>
+        <caption id="cases-caption" class="govuk-table__caption govuk-table__caption--m">@Model.Cases.Count case@(Model.Cases.Count == 1 ? "" : "s")</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Case</th>
@@ -28,7 +28,7 @@ else
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
                         <a class="govuk-link" href="/Cases/@c.Id">@c.Title</a>
-                        <span class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">@c.Reference@(c.Accommodation is { } a ? $" · {a.Address}" : "")</span>
+                        <span class="app-secondary-text">@c.Reference@(c.Accommodation is { } a ? $" · {a.Address}" : "")</span>
                     </td>
                     <td class="govuk-table__cell govuk-table__cell--numeric">@c.Guests.Count()</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric">@Display.Age(youngest?.DateOfBirth, Model.Today)</td>

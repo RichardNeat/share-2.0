@@ -145,3 +145,27 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** The team wants one term. The brief uses "accommodation request" as a synonym for case, which is where the `AR-` prefix and a sentence on the Cases page came from
 - **What:** References are now `CASE-0003`. The Cases page sentence and a code comment no longer mention accommodation requests. CLAUDE.md has a new Terminology section so the term doesn't come back
+
+## 2026-10-08 · GDS and accessibility review (after M3)
+
+### 28. Audit every page with axe-core in headless Chrome, at desktop and phone width
+
+- **Why:** The team asked for a full check of GDS styling and accessibility. Our journey tests cover structure (title, one h1, skip link, labels) but not colour contrast, ARIA or layout at phone width
+- **What:** `tools/a11y-audit.mjs` drives headless Chrome over the DevTools protocol (no Playwright, no installs), runs axe-core for WCAG 2.2 AA plus best practice, and checks for sideways scrolling at 1280px and 390px. CLAUDE.md now says to run it before each milestone commit
+- **Result:** 16 pages at 2 widths, no WCAG violations and no sideways scrolling
+
+### 29. Accept axe's `region` best-practice note on the phase banner and back links
+
+- **Why:** GOV.UK Design System guidance places both before `<main>`. GDS guidance wins over a best-practice rule. It is listed as a known issue in the accessibility statement
+
+### 30. Fixes from the review
+
+- **Focus contrast:** when "The Share" header link had keyboard focus, the tagline stayed light grey on the yellow focus background. It now turns black like the rest of the link. axe can't catch this because it doesn't apply focus; screenshots of tabbing through the page did
+- **Table regions:** every scrollable table box was labelled "Scrollable table", so two on one page were indistinguishable. Each is now labelled by its own table caption. A table box is a keyboard stop only when it actually scrolls (decided in the browser, updated on resize), so desktop users don't tab through empty stops. Its focus ring gains a black inner edge so it shows on white
+- **Right component:** "There are no more files to process" used the error summary, which GOV.UK reserves for form validation. It is now an "Important" notification banner
+- **Right class:** the reference line under each case title used `govuk-hint`, a form-only class. It now uses a small `app-secondary-text` class in GOV.UK's secondary text colour
+
+### 31. Add an accessibility statement, linked from the footer
+
+- **Why:** Every GOV.UK service has one, and the scoring criteria reward a true sentence about accessibility
+- **What:** It claims only what we have done and tested, says plainly that no specialist audit or assistive technology testing has happened, and lists the known issue

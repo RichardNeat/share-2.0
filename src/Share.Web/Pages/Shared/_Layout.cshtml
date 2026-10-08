@@ -77,11 +77,28 @@
         <div class="govuk-width-container">
             <div class="govuk-footer__meta">
                 <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <h2 class="govuk-visually-hidden">Support links</h2>
+                    <ul class="govuk-footer__inline-list">
+                        <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/Accessibility">Accessibility statement</a></li>
+                    </ul>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Homes for Ukraine casework. Hackathon 2026. Every name and record is invented.</p>
                 </div>
             </div>
         </div>
     </footer>
+    <script>
+        // A table box only needs to be a keyboard stop (and a labelled region) when it actually scrolls.
+        (function () {
+            function update() {
+                document.querySelectorAll('.app-table-wrapper').forEach(function (w) {
+                    if (w.scrollWidth > w.clientWidth) { w.setAttribute('tabindex', '0'); w.setAttribute('role', 'region'); }
+                    else { w.removeAttribute('tabindex'); w.removeAttribute('role'); }
+                });
+            }
+            update();
+            window.addEventListener('resize', update);
+        })();
+    </script>
     <script type="module">
         import { initAll } from 'https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.js';
         initAll();

@@ -48,6 +48,7 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 - Every page gets the shared accessibility assertions: a non-empty `<title>`, exactly one `h1`, the skip link to `#main-content`, and a `label[for]` for every visible input, select and textarea
 - Run the full suite (unit and journey tests, `dotnet test` from the repo root) after every major change, meaning whenever you reach a point you would be ready to commit. Not after every minor edit
 - Always run it before you say a milestone is done
+- Before suggesting a milestone commit, also run the accessibility audit against the running app on every page the milestone touched: `node --experimental-websocket tools/a11y-audit.mjs / /Cases /Cases/1 ...`. It runs axe-core (WCAG 2.2 AA plus best practice) at 1280px and 390px and reports sideways overflow. The only accepted finding is `region` on the phase banner and back links (GOV.UK places them outside `main`)
 
 ## Working agreement
 
