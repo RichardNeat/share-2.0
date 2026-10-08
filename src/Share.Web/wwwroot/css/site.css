@@ -30,3 +30,6 @@
 
 /* Secondary detail under a link in a table cell (GOV.UK secondary text colour) */
 .app-secondary-text { display: block; color: #505a5f; font-size: 1rem; line-height: 1.25; margin-top: 5px; }
+
+/* Random blue background (1 in 10 chance) */
+.app-blue-background { background-color: #0087dc; }
