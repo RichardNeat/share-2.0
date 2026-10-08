@@ -23,6 +23,13 @@
 <h2 class="govuk-heading-m">Linked records</h2>
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Case</dt>
+        <dd class="govuk-summary-list__value">
+            @if (app.Case is { } c) { <a class="govuk-link" href="/Cases/@c.Id">@c.Reference</a> } else { @:Not yet in a case
+            }
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Visa application</dt>
         <dd class="govuk-summary-list__value"><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a></dd>
     </div>

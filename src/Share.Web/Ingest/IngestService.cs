@@ -47,11 +47,13 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
         run.AlreadyPresent = 0;
         run.PeopleAdded = 0;
         run.AccommodationsAdded = 0;
+        run.CasesAdded = 0;
         run.SkippedRows.Clear();
 
         var known = (await db.VisaApplications.Select(a => a.SubmissionGuid).ToListAsync()).ToHashSet();
         var people = await db.People.ToDictionaryAsync(x => x.MatchKey);
         var accommodations = await db.Accommodations.ToDictionaryAsync(x => x.MatchKey);
+        var cases = await db.Cases.ToDictionaryAsync(x => x.MatchKey);
 
         Person? Resolve(Person? person)
         {
@@ -90,6 +92,18 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
             db.VisaApplications.Add(app);
             run.Added++;
 
+            // Form the case: same sponsor and same accommodation means the same household case.
+            var caseKey = RecordKeys.Case(app.Sponsor?.MatchKey, app.Accommodation?.MatchKey, app.Uan);
+            var caseIsNew = false;
+            if (!cases.TryGetValue(caseKey, out var @case))
+            {
+                @case = new Case { MatchKey = caseKey, Sponsor = app.Sponsor, Accommodation = app.Accommodation, Council = app.Accommodation?.Council ?? app.Council };
+                cases[caseKey] = @case;
+                run.CasesAdded++;
+                caseIsNew = true;
+            }
+            app.Case = @case;
+
             var lead = app.Lead!;
             var others = app.Guests.Count - 1;
             run.Events.Add(new TimelineEvent
@@ -101,7 +115,21 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
                     ? $"{lead.FullName} applied ({app.Uan})"
                     : $"{lead.FullName} applied with {others} family member{(others == 1 ? "" : "s")} ({app.Uan})",
                 VisaApplication = app,
+                Case = @case,
             });
+            if (caseIsNew)
+            {
+                run.Events.Add(new TimelineEvent
+                {
+                    Kind = TimelineEventKind.CaseFormed,
+                    OccurredAt = app.SubmittedAt,
+                    Title = "Case formed",
+                    Description = app.Accommodation is null
+                        ? $"New case for {app.Lead?.FullName}"
+                        : $"New case for {app.Accommodation.Address}",
+                    Case = @case,
+                });
+            }
         }
     }
 }

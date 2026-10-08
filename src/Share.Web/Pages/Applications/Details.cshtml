@@ -12,6 +12,13 @@
 
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Visa status</dt><dd class="govuk-summary-list__value"><partial name="_VisaStatusTag" model="a.Status" /></dd></div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Case</dt>
+        <dd class="govuk-summary-list__value">
+            @if (a.Case is { } c) { <a class="govuk-link" href="/Cases/@c.Id">@c.Reference</a> } else { @:Not yet in a case
+            }
+        </dd>
+    </div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">UAN</dt><dd class="govuk-summary-list__value">@a.Uan</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">GWF number</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(a.Gwf)</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Submitted</dt><dd class="govuk-summary-list__value">@Display.DateTime(a.SubmittedAt)</dd></div>

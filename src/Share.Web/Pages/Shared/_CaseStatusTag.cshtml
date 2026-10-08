@@ -1,0 +1,3 @@
+@model CaseStatus
+@{ var (text, css) = Display.CaseStatusTag(Model); }
+<strong class="govuk-tag @css">@text</strong>

@@ -29,6 +29,11 @@ public static partial class RecordKeys
     public static string? Host(string? givenName, string? familyName, string applicationUan) =>
         string.IsNullOrWhiteSpace($"{givenName}{familyName}") ? null : $"host-on|{applicationUan}";
 
+    // A case groups applications with the same sponsor and the same accommodation.
+    // If either is missing we cannot know who else belongs, so the application gets a case of its own.
+    public static string Case(string? sponsorKey, string? accommodationKey, string applicationUan) =>
+        sponsorKey is null || accommodationKey is null ? $"application|{applicationUan}" : $"{sponsorKey}||{accommodationKey}";
+
     // An accommodation is identified by its address and council.
     public static string? Accommodation(string? address, string? council)
     {

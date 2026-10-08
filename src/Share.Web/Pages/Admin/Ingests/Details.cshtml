@@ -14,6 +14,7 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Records in file</dt><dd class="govuk-summary-list__value">@r.RecordsInFile</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Applications added</dt><dd class="govuk-summary-list__value">@r.Added</dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Cases formed</dt><dd class="govuk-summary-list__value">@r.CasesAdded</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New sponsors and hosts</dt><dd class="govuk-summary-list__value">@r.PeopleAdded</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">New accommodations</dt><dd class="govuk-summary-list__value">@r.AccommodationsAdded</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Already ingested</dt><dd class="govuk-summary-list__value">@r.AlreadyPresent</dd></div>
@@ -32,7 +33,11 @@ else
         {
             <li>
                 <strong>@e.Title:</strong>
-                @if (e.VisaApplicationId is int appId)
+                @if (e.Kind == TimelineEventKind.CaseFormed && e.CaseId is int caseId)
+                {
+                    <a class="govuk-link" href="/Cases/@caseId">@e.Description</a>
+                }
+                else if (e.VisaApplicationId is int appId)
                 {
                     <a class="govuk-link" href="/Applications/@appId">@e.Description</a>
                 }

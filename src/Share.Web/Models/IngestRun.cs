@@ -11,6 +11,7 @@ public class IngestRun
     public int AlreadyPresent { get; set; }
     public int PeopleAdded { get; set; }
     public int AccommodationsAdded { get; set; }
+    public int CasesAdded { get; set; }
     public List<SkippedRow> SkippedRows { get; set; } = [];
     public List<TimelineEvent> Events { get; set; } = [];
 }

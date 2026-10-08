@@ -16,6 +16,7 @@ public class DetailsModel(AppDbContext db) : PageModel
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Sponsor)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Accommodation)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Host)
+            .Include(g => g.VisaApplication).ThenInclude(a => a!.Case)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Guests)
             .FirstOrDefaultAsync(g => g.Id == id);
         if (guest is null) return NotFound();

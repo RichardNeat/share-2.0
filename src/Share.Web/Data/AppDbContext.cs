@@ -9,6 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Guest> Guests => Set<Guest>();
     public DbSet<Person> People => Set<Person>();
     public DbSet<Accommodation> Accommodations => Set<Accommodation>();
+    public DbSet<Case> Cases => Set<Case>();
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
 
@@ -29,5 +30,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         b.Entity<IngestRun>().HasIndex(r => r.FileName).IsUnique();
         b.Entity<Person>().HasIndex(x => x.MatchKey).IsUnique();
         b.Entity<Accommodation>().HasIndex(x => x.MatchKey).IsUnique();
+        b.Entity<Case>(e =>
+        {
+            e.HasIndex(c => c.MatchKey).IsUnique();
+            e.Ignore(c => c.Guests);
+        });
     }
 }

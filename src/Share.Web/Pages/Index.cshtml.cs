@@ -6,6 +6,7 @@ namespace Share.Web.Pages;
 
 public class IndexModel(AppDbContext db) : PageModel
 {
+    public int CaseCount { get; private set; }
     public int ApplicationCount { get; private set; }
     public int GuestCount { get; private set; }
     public int SponsorCount { get; private set; }
@@ -14,6 +15,7 @@ public class IndexModel(AppDbContext db) : PageModel
 
     public async Task OnGetAsync()
     {
+        CaseCount = await db.Cases.CountAsync();
         ApplicationCount = await db.VisaApplications.CountAsync();
         GuestCount = await db.Guests.CountAsync();
         SponsorCount = await db.People.CountAsync(p => p.SponsoredApplications.Any());

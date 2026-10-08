@@ -113,3 +113,35 @@ A running timeline of the major decisions made while building this service, olde
 ### 21. Console `reset` and `seed` run before the startup migration
 
 - **Why:** This milestone's migration drops and recreates the people table. Running the console commands first means they can always recover an old local `app.db`, instead of failing on a migration that conflicts with stale data
+
+## 2026-10-08 · M3 Build the case
+
+### 22. A case groups applications with the same sponsor (by email) and the same accommodation (by address and council)
+
+- **Why:** The brief's rule, applied with the identifiers we chose in M2, so we still never match on names
+- **What:** If an application is missing its sponsor or its accommodation, it gets a case of its own. Without both, we can't know who else belongs with it, and we won't guess. In file 01, Clare Osborne's two applications form one case and the other six stand alone: 7 cases from 8 applications
+- **What:** The case's council comes from the accommodation (falling back to the application's "Local authority of UK address", which is the same answer)
+
+### 23. Case reference `AR-` plus a number, and a title made from the households' family names
+
+- **Why:** References must be the same on every reseed, and caseworkers think in households. The number comes from ingest order on an empty database
+- **What:** "Melnyk household", or "Kovalenko and Lysenko households" when two families share a case, listed in the order they applied
+
+### 24. Case status reads "Checks required" until M4
+
+- **Why:** The ticket asks for a status now. M4's rule gives "Checks required" for a case with no passing or failed checks, so this is the true value, not a placeholder that will change meaning
+- **What:** All five case statuses have one wording and one tag colour each, ready for M4
+
+### 25. "Today" is pinned to 2026-10-08 in `appsettings.json`
+
+- **Why:** Ages (the youngest guest now, the Enhanced DBS rule in M4) must come out the same in every demo run. Tests pin 2026-10-01. Change `Clock:Today` to move it, or remove it to use the real date
+- **What:** Ages are in whole years. Someone born on 29 February has their birthday on 1 March in other years, as UK law treats it, which also errs towards "under 18". A unit test caught .NET's default of 28 February
+
+### 26. Ingest records a "Case formed" event for each new case
+
+- **Why:** It feeds the "What just happened" page now (with links to the new cases) and the case timeline in M5. "Application received" events now carry their case too
+
+### 27. Say "case" only, never "accommodation request" (replaces the `AR-` prefix in decision 23)
+
+- **Why:** The team wants one term. The brief uses "accommodation request" as a synonym for case, which is where the `AR-` prefix and a sentence on the Cases page came from
+- **What:** References are now `CASE-0003`. The Cases page sentence and a code comment no longer mention accommodation requests. CLAUDE.md has a new Terminology section so the term doesn't come back

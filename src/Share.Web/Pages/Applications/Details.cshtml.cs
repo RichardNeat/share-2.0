@@ -17,6 +17,7 @@ public class DetailsModel(AppDbContext db) : PageModel
             .Include(a => a.Sponsor)
             .Include(a => a.Host)
             .Include(a => a.Accommodation)
+            .Include(a => a.Case)
             .FirstOrDefaultAsync(a => a.Id == id);
         if (app is null) return NotFound();
         Application = app;

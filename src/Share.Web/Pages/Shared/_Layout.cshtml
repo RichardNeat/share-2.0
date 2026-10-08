@@ -33,6 +33,9 @@
                 <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
                     <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden>Menu</button>
                     <ul class="govuk-service-navigation__list" id="navigation">
+                        <li class="govuk-service-navigation__item @(Active("/Cases") ? "govuk-service-navigation__item--active" : "")">
+                            <a class="govuk-service-navigation__link" href="/Cases" @(Active("/Cases") ? "aria-current=page" : "")>Cases</a>
+                        </li>
                         <li class="govuk-service-navigation__item @(Active("/Applications") ? "govuk-service-navigation__item--active" : "")">
                             <a class="govuk-service-navigation__link" href="/Applications" @(Active("/Applications") ? "aria-current=page" : "")>Applications</a>
                         </li>

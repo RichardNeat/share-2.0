@@ -3,6 +3,7 @@ namespace Share.Web.Models;
 public enum TimelineEventKind
 {
     ApplicationReceived,
+    CaseFormed,
 }
 
 // One log of meaningful changes. Feeds the ingest summary now and the case timeline (M5).
@@ -16,5 +17,7 @@ public class TimelineEvent
     public string? Description { get; set; }
     public int? VisaApplicationId { get; set; }
     public VisaApplication? VisaApplication { get; set; }
+    public int? CaseId { get; set; }
+    public Case? Case { get; set; }
     public int? IngestRunId { get; set; }
 }

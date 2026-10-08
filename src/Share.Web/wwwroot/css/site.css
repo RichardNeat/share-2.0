@@ -21,3 +21,6 @@
 /* Wide tables scroll inside their own box on small screens, never the whole page */
 .app-table-wrapper { overflow-x: auto; }
 .app-table-wrapper:focus { outline: 3px solid #ffdd00; outline-offset: 0; }
+
+/* Status tags stay on one line in tables */
+.govuk-table .govuk-tag { white-space: nowrap; }
