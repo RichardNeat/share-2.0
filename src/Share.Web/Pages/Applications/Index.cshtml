@@ -3,8 +3,8 @@
 @{ ViewData["Title"] = "Visa applications"; }
 <h1 class="govuk-heading-l">Visa applications</h1>
 
-<form method="get" class="govuk-!-margin-bottom-6" novalidate>
-    <div class="govuk-form-group govuk-!-display-inline-block govuk-!-margin-right-2 govuk-!-margin-bottom-0">
+<form method="get" class="app-filter govuk-!-margin-bottom-6" novalidate>
+    <div class="govuk-form-group govuk-!-margin-bottom-0">
         <label class="govuk-label" for="status">Visa status</label>
         <select class="govuk-select" id="status" name="status">
             <option value="">All statuses</option>
@@ -30,6 +30,7 @@
 }
 else
 {
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
     <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">@Model.Applications.Count application@(Model.Applications.Count == 1 ? "" : "s")@(Model.Status is null ? "" : $" with status {Display.VisaStatusTag(Model.Status.Value).Text}")</caption>
         <thead class="govuk-table__head">
@@ -56,4 +57,5 @@ else
             }
         </tbody>
     </table>
+    </div>
 }

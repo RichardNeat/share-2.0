@@ -59,8 +59,8 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 
 The site must look like a real government service after every milestone, not just at the end. Never leave a page unstyled "for later".
 
-- Layout from the GOV.UK page template: skip link, GOV.UK header with the service name "Share", service navigation, an alpha phase banner, `govuk-width-container` and `main#main-content`, GOV.UK footer
-- Page titles follow `<Page> - Share - GOV.UK`. Headings go down in order with no skipped levels. Use `govuk-heading-l` for the h1 and a caption where it helps (for example, the case reference)
+- Layout from the GOV.UK page template: skip link, GOV.UK header with "The Share" logo and service name, service navigation, an alpha phase banner, `govuk-width-container` and `main#main-content`, GOV.UK footer
+- Page titles follow `<Page> - The Share - GOV.UK`. Headings go down in order with no skipped levels. Use `govuk-heading-l` for the h1 and a caption where it helps (for example, the case reference)
 - Use GOV.UK components, never home-made ones: summary lists for record details, tables with a caption for lists, tags for statuses (one wording and one colour per status, in a shared partial), a notification banner for success messages, back links or breadcrumbs, and the warning button for destructive actions
 - Forms: GOV.UK fieldsets, radios and selects, an error summary plus inline errors on validation failure, and a POST-redirect-GET after every action
 - Filters use GET forms so the URL can be shared and keyboard users can reach them. Every link to a related record is a real link with meaningful text (no "click here")

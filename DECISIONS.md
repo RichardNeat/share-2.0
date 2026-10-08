@@ -74,3 +74,8 @@ A running timeline of the major decisions made while building this service, olde
 ### 14. Reset uses `EnsureDeleted` then `Migrate`
 
 - **Why:** It is the simplest way to guarantee a truly empty state, and new tables are picked up automatically as models are added. Ingest runs are numbered from 1 again after every reset, so links and IDs repeat exactly
+
+### 15. The header shows the logo and the name "The Share" together; page titles say "The Share"
+
+- **Why:** On its own the logo sat small and top-aligned in an empty black bar, and nothing said what the service was. Putting a larger logo (88 px) beside the name and the tagline "Homes for Ukraine casework" fills the header and matches the artwork
+- **What:** The logo has empty alt text because the link already reads "The Share, Homes for Ukraine casework". The service name moves out of the service navigation so it isn't shown twice. The header's blue border runs full width. Page titles become `<Page> - The Share - GOV.UK`. Wide tables scroll inside their own focusable box, so the page never scrolls sideways on a phone
