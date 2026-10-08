@@ -22,6 +22,7 @@ builder.Services.AddScoped<IngestService>();
 builder.Services.AddScoped<DemoSeeder>();
 builder.Services.AddScoped<Share.Web.Safeguarding.CheckService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 
