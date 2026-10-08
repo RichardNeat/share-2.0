@@ -29,6 +29,8 @@ builder.Services.AddScoped<Share.Web.Safeguarding.RematchService>();
 builder.Services.AddScoped<Share.Web.Matching.DuplicateService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<SearchService>();
+builder.Services.AddScoped<DownloadService>();
 
 var app = builder.Build();
 

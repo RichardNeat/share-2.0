@@ -1,0 +1,52 @@
+@page
+@model DownloadsModel
+
+@{
+    ViewData["Title"] = "Downloads - The Share - GOV.UK";
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        <h1 class="govuk-heading-l">Downloads</h1>
+
+        <p class="govuk-body">Download your data as CSV for use in spreadsheets and other tools.</p>
+
+        <form method="post" class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h2 class="govuk-fieldset__heading">Record type</h2>
+                </legend>
+                <div class="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="guests" name="recordType" type="radio" value="guests">
+                        <label class="govuk-label govuk-radios__label" for="guests">
+                            Guests
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="people" name="recordType" type="radio" value="people">
+                        <label class="govuk-label govuk-radios__label" for="people">
+                            Sponsors and hosts
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="accommodations" name="recordType" type="radio" value="accommodations">
+                        <label class="govuk-label govuk-radios__label" for="accommodations">
+                            Accommodations
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="cases" name="recordType" type="radio" value="cases">
+                        <label class="govuk-label govuk-radios__label" for="cases">
+                            Cases
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <button type="submit" class="govuk-button">
+                Download CSV
+            </button>
+        </form>
+    </main>
+</div>

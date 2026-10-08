@@ -1,0 +1,130 @@
+@page
+@model SearchModel
+
+@{
+    ViewData["Title"] = "Search - The Share - GOV.UK";
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        <h1 class="govuk-heading-l">Search</h1>
+
+        <form method="get" class="govuk-form-group">
+            <label for="query" class="govuk-label">
+                <strong>Search across cases, guests, sponsors and accommodations</strong>
+            </label>
+            <input type="text" id="query" name="query" value="@Model.Query" class="govuk-input" placeholder="Name, reference number, postcode or address" />
+            <button type="submit" class="govuk-button">Search</button>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Query) && Model.Results != null)
+        {
+            @if (Model.Results.HasResults)
+            {
+                @if (Model.Results.Cases.Any())
+                {
+                    <div class="govuk-form-group">
+                        <h2 class="govuk-heading-m">Cases</h2>
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header">Reference</th>
+                                    <th scope="col" class="govuk-table__header">Title</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var case_ in Model.Results.Cases)
+                                {
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell"><a href="/Cases/@case_.Id" class="govuk-link">@case_.Reference</a></td>
+                                        <td class="govuk-table__cell">@case_.Title</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (Model.Results.Guests.Any())
+                {
+                    <div class="govuk-form-group">
+                        <h2 class="govuk-heading-m">Guests</h2>
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header">Name</th>
+                                    <th scope="col" class="govuk-table__header">GWF</th>
+                                    <th scope="col" class="govuk-table__header">Application</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var guest in Model.Results.Guests)
+                                {
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell"><a href="/Guests/@guest.Id" class="govuk-link">@guest.FullName</a></td>
+                                        <td class="govuk-table__cell">@guest.Gwf</td>
+                                        <td class="govuk-table__cell"><a href="/Applications/@guest.VisaApplicationId" class="govuk-link">@guest.VisaApplication?.Uan</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (Model.Results.People.Any())
+                {
+                    <div class="govuk-form-group">
+                        <h2 class="govuk-heading-m">Sponsors and hosts</h2>
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header">Name</th>
+                                    <th scope="col" class="govuk-table__header">Email</th>
+                                    <th scope="col" class="govuk-table__header">Postcode</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var person in Model.Results.People)
+                                {
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell"><a href="/People/@person.Id" class="govuk-link">@person.FullName</a></td>
+                                        <td class="govuk-table__cell">@person.Email</td>
+                                        <td class="govuk-table__cell">@person.Postcode</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (Model.Results.Accommodations.Any())
+                {
+                    <div class="govuk-form-group">
+                        <h2 class="govuk-heading-m">Accommodations</h2>
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header">Address</th>
+                                    <th scope="col" class="govuk-table__header">Postcode</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var acc in Model.Results.Accommodations)
+                                {
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell"><a href="/Accommodations/@acc.Id" class="govuk-link">@acc.Address</a></td>
+                                        <td class="govuk-table__cell">@acc.Postcode</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="govuk-body">No results found for "@Model.Query"</p>
+            }
+        }
+    </main>
+</div>
