@@ -52,6 +52,7 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 ## Working agreement
 
 - Never `git commit` without being asked. After each milestone: run the tests, list how to check each acceptance criterion, and suggest a commit message
+- **Keep `DECISIONS.md` up to date.** Every time you make a major decision (a data model, a matching or status rule, a library, a trade-off, a change of plan, or anything you chose not to do), add a numbered entry at the bottom under a dated heading for the milestone. Each entry says what you decided, why, and what you turned down. Update it after every implementation, before suggesting the commit, so it goes into the same commit. Add entries only; never rewrite earlier ones. If a decision is reversed, add a new entry that names the earlier one
 - Accessibility and GDS patterns come first: one h1, labelled inputs, keyboard-reachable actions, and statuses as GOV.UK tags with words (never colour alone)
 
 ## Looks: a real GOV.UK service at all times
