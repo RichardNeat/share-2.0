@@ -12,7 +12,8 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=app.db"));
+    o.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=app.db")
+     .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 var dataDirectory = builder.Configuration["DataDirectory"]
     ?? Path.Combine(builder.Environment.ContentRootPath, "..", "..", "data");

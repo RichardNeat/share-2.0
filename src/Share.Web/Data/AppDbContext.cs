@@ -24,6 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     public DbSet<DuplicateDismissal> DuplicateDismissals => Set<DuplicateDismissal>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Comment> Comments => Set<Comment>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -44,6 +45,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             || ((e.VisaApplicationId == null || e.VisaApplication!.Council == CouncilScope)
                 && (e.CaseId == null || e.Case!.Council == CouncilScope)
                 && (e.OfferId == null || e.Offer!.Council == CouncilScope)));
+        b.Entity<Comment>().HasQueryFilter(c => CouncilScope == null || c.Case!.Council == CouncilScope);
 
         b.Entity<VisaApplication>(e =>
         {
