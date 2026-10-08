@@ -216,3 +216,8 @@ A running timeline of the major decisions made while building this service, olde
 - **M5:** an arrival in the feed will also unlock check 4. Recording an arrival opens the check but doesn't pass it; the caseworker still sets check 4's status
 - **Not yet:** which caseworker recorded it. There are no users until M6
 - **Turned down:** leaving check 4 open all the time, which would allow "guests arrived" to pass before anyone had arrived
+
+### 40. Tags in tables wrap instead of being forced onto one line (replaces the nowrap rule from M3)
+
+- **Why:** The team spotted "Enhanced DBS required" being cut off in the case list. Forcing tags onto one line made them wider than the Status column, so they spilled out of the table's scroll box
+- **What:** Tags in tables have no width cap, so the table sizes the Status column to fit them. A tag wraps inside its cell only when space really runs out (checked at 1280px, 1000px and 390px)
