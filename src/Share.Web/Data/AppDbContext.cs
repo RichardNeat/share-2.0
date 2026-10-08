@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Case> Cases => Set<Case>();
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
+    public DbSet<Announcement> Announcements => Set<Announcement>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -42,6 +43,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(c => c.MatchKey).IsUnique();
             e.Ignore(c => c.Guests);
             e.HasMany(c => c.Checks).WithOne().HasForeignKey(x => x.CaseId);
+        });
+        b.Entity<Announcement>(e =>
+        {
+            e.HasIndex(a => new { a.IsHidden, a.PublishAt }).IsDescending(false, true);
+            e.HasIndex(a => a.CreatedAt);
         });
     }
 }

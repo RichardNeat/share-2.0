@@ -1,0 +1,37 @@
+@page
+@model CreateModel
+@{ ViewData["Title"] = "Create announcement - Admin"; }
+
+<a href="/Admin/Announcements" class="govuk-back-link">Back</a>
+
+<h1 class="govuk-heading-l">Create announcement</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <div class="govuk-form-group">
+                <label for="Title" class="govuk-label govuk-label--l">
+                    <span class="govuk-visually-hidden">Announcement </span>title
+                </label>
+                <input type="text" class="govuk-input" id="Title" asp-for="Title" />
+            </div>
+
+            <div class="govuk-form-group">
+                <label for="Body" class="govuk-label govuk-label--l">Body</label>
+                <textarea class="govuk-textarea" id="Body" asp-for="Body" rows="8"></textarea>
+            </div>
+
+            <div class="govuk-form-group">
+                <label for="Link" class="govuk-label">Optional link (URL)</label>
+                <input type="url" class="govuk-input" id="Link" asp-for="Link" />
+            </div>
+
+            <div class="govuk-form-group">
+                <label for="PublishAt" class="govuk-label">Publish date (optional — leave blank to publish immediately)</label>
+                <input type="datetime-local" class="govuk-input" id="PublishAt" asp-for="PublishAt" />
+            </div>
+
+            <button type="submit" class="govuk-button">Create announcement</button>
+        </form>
+    </div>
+</div>

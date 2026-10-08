@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Share.Web;
 using Share.Web.Data;
 using Share.Web.Ingest;
+using Share.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ builder.Services.AddSingleton<TimeProvider>(
 builder.Services.AddScoped<IngestService>();
 builder.Services.AddScoped<DemoSeeder>();
 builder.Services.AddScoped<Share.Web.Safeguarding.CheckService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 
 var app = builder.Build();
 
