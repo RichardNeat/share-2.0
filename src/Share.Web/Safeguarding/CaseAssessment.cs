@@ -48,8 +48,25 @@ public static class SafeguardingRules
         return (recorded, null);
     }
 
-    // Check 4 opens once a guest on the case has arrived (arrivals come in M5).
-    public static bool GuestsHaveArrived(Case c) => c.Applications.Any(a => a.Status == VisaStatus.Arrived);
+    // Check 4 opens once guests have arrived: recorded by a caseworker, or shown by the arrivals feed (M5).
+    public static bool GuestsHaveArrived(Case c) =>
+        c.ArrivalRecordedOn is not null || c.Applications.Any(a => a.Status == VisaStatus.Arrived);
+
+    // Validates the arrival date a caseworker enters (GOV.UK date input: day, month, year).
+    public static (DateOnly? Date, string? Error) ValidateArrivalDate(string? day, string? month, string? year, DateOnly today)
+    {
+        if (string.IsNullOrWhiteSpace(day) && string.IsNullOrWhiteSpace(month) && string.IsNullOrWhiteSpace(year))
+            return (null, "Enter the date the guests arrived");
+        if (string.IsNullOrWhiteSpace(day)) return (null, "Date the guests arrived must include a day");
+        if (string.IsNullOrWhiteSpace(month)) return (null, "Date the guests arrived must include a month");
+        if (string.IsNullOrWhiteSpace(year)) return (null, "Date the guests arrived must include a year");
+        if (!int.TryParse(day.Trim(), out var d) || !int.TryParse(month.Trim(), out var m) || !int.TryParse(year.Trim(), out var y)
+            || year.Trim().Length != 4 || m is < 1 or > 12 || d < 1 || d > DateTime.DaysInMonth(y is >= 1 and <= 9999 ? y : 2000, m))
+            return (null, "Date the guests arrived must be a real date");
+        var date = new DateOnly(y, m, d);
+        if (date > today) return (null, "Date the guests arrived must be today or in the past");
+        return (date, null);
+    }
 
     public static CaseAssessment Assess(Case c, DateOnly today)
     {

@@ -208,3 +208,11 @@ A running timeline of the major decisions made while building this service, olde
 - **Why:** The team asked us to avoid JavaScript where we can, for accessibility. GOV.UK Frontend is built to work without it, and every page is server-rendered
 - **What:** Removed the GOV.UK Frontend script and `initAll`, the `js-enabled` body class, every `data-module` hook, the mobile "Menu" button, and our table script. On a phone the navigation shows as a plain list. Error summaries and banners still announce through `role="alert"`, and their links still go to the fields. Each wide table is now always a labelled, keyboard-reachable region (the standard no-JavaScript pattern), at the cost of one extra tab stop per table on desktop. The accessibility statement says the service uses no JavaScript
 - **Replaces:** the "table is a tab stop only when it scrolls" part of decision 30, which needed a script
+
+### 39. Caseworkers can record an arrival, which unlocks check 4 (builds on decision 35)
+
+- **Why:** The team wants council users to be able to say guests have arrived, not just wait for the Home Office arrivals feed. The feed only says someone reached the UK, not that they're at the accommodation, and some arrivals may never appear in it
+- **What:** Check 4 has a "Record arrival" link that opens a GOV.UK date input (day, month, year, plain HTML): "When did the guests arrive at the accommodation?" The date must be real and today or earlier, with GOV.UK's standard date error messages. Once recorded, check 4 opens. The case shows "Guests arrived on … (recorded by a caseworker)" with a "Change arrival date" link, and the timeline gets "Guests arrived" (or "Arrival date changed")
+- **M5:** an arrival in the feed will also unlock check 4. Recording an arrival opens the check but doesn't pass it; the caseworker still sets check 4's status
+- **Not yet:** which caseworker recorded it. There are no users until M6
+- **Turned down:** leaving check 4 open all the time, which would allow "guests arrived" to pass before anyone had arrived

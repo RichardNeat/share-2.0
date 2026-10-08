@@ -43,8 +43,45 @@ public class ChecksJourneyTests : IClassFixture<AppFactory>
         for (var i = 1; i <= 3; i++)
             Assert.NotNull(Row(page, $"{i}.").QuerySelector(".govuk-summary-list__actions a"));
         var check4 = Row(page, "4.");
-        Assert.Null(check4.QuerySelector(".govuk-summary-list__actions"));
+        Assert.Equal("Record arrival of the guests", Text(check4.QuerySelector(".govuk-summary-list__actions a")));
         Assert.Contains("Available when guests arrive", Text(check4));
+    }
+
+    [Fact]
+    public async Task Recording_an_arrival_unlocks_check_4_and_completes_the_case()
+    {
+        await _factory.SeedThroughAsync(1);
+        var href = await CaseHref("Shevchenko household");
+        await UpdateCheck(href, 1, new() { ["Status"] = "Passed" });
+        await UpdateCheck(href, 2, new() { ["Status"] = "Passed" });
+        var page = await UpdateCheck(href, 3, new() { ["Status"] = "Passed", ["DbsType"] = "Standard" });
+        Assert.Equal("Pre-arrival checks complete", Status(page));
+
+        var arrivalForm = await _client.GetPageAsync(Row(page, "4.").QuerySelector(".govuk-summary-list__actions a")!.GetAttribute("href")!);
+        Html.AssertAccessible(arrivalForm);
+        page = await _client.SubmitAsync(arrivalForm, "main form", new() { ["Day"] = "26", ["Month"] = "2", ["Year"] = "2026" });
+        Assert.Contains("Arrival recorded", Text(page.QuerySelector(".govuk-notification-banner")));
+        Assert.Contains("Guests arrived on 26 February 2026", Text(Row(page, "4.")));
+
+        page = await UpdateCheck(href, 4, new() { ["Status"] = "Passed" });
+        Assert.Equal("Checks completed", Status(page));
+    }
+
+    [Theory]
+    [InlineData("", "", "", "Enter the date the guests arrived")]
+    [InlineData("31", "2", "2026", "must be a real date")]
+    [InlineData("1", "1", "2099", "must be today or in the past")]
+    public async Task Arrival_date_is_validated_with_an_error_summary(string day, string month, string year, string message)
+    {
+        await _factory.SeedThroughAsync(1);
+        var form = await _client.GetPageAsync($"{await CaseHref("Kravets household")}/Arrival");
+        var page = await _client.SubmitAsync(form, "main form", new() { ["Day"] = day, ["Month"] = month, ["Year"] = year });
+
+        Html.AssertAccessible(page);
+        Assert.StartsWith("Error:", page.Title);
+        var link = page.QuerySelector(".govuk-error-summary a")!;
+        Assert.Contains(message, Text(link));
+        Assert.NotNull(page.QuerySelector(link.GetAttribute("href")!));
     }
 
     [Fact]

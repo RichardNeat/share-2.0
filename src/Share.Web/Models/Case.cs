@@ -13,6 +13,10 @@ public class Case
     public List<VisaApplication> Applications { get; set; } = [];
     public List<CaseCheck> Checks { get; set; } = [];
 
+    // Recorded by a caseworker on the case page. The arrivals feed (M5) can also show guests as arrived.
+    public DateOnly? ArrivalRecordedOn { get; set; }
+    public DateTime? ArrivalRecordedAt { get; set; }
+
     // Deterministic: Ids are assigned in ingest order on an empty database.
     public string Reference => $"CASE-{Id:D4}";
 
