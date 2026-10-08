@@ -50,10 +50,11 @@ public class IngestService(AppDbContext db, DataFiles files, TimeProvider clock)
         run.CasesAdded = 0;
         run.SkippedRows.Clear();
 
-        var known = (await db.VisaApplications.Select(a => a.SubmissionGuid).ToListAsync()).ToHashSet();
-        var people = await db.People.ToDictionaryAsync(x => x.MatchKey);
-        var accommodations = await db.Accommodations.ToDictionaryAsync(x => x.MatchKey);
-        var cases = await db.Cases.ToDictionaryAsync(x => x.MatchKey);
+        // Matching must see every council's records, whoever is signed in.
+        var known = (await db.VisaApplications.IgnoreQueryFilters().Select(a => a.SubmissionGuid).ToListAsync()).ToHashSet();
+        var people = await db.People.IgnoreQueryFilters().ToDictionaryAsync(x => x.MatchKey);
+        var accommodations = await db.Accommodations.IgnoreQueryFilters().ToDictionaryAsync(x => x.MatchKey);
+        var cases = await db.Cases.IgnoreQueryFilters().ToDictionaryAsync(x => x.MatchKey);
 
         Person? Resolve(Person? person)
         {

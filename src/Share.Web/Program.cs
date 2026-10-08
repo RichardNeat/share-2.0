@@ -2,10 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Share.Web;
 using Share.Web.Data;
 using Share.Web.Ingest;
+using Share.Web.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=app.db"));
 
@@ -53,6 +56,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
+app.UseStatusCodePagesWithReExecute("/NotFound");
 
 app.UseRouting();
 app.UseAuthorization();

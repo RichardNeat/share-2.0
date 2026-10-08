@@ -30,3 +30,7 @@
 
 /* Secondary detail under a link in a table cell (GOV.UK secondary text colour) */
 .app-secondary-text { display: block; color: #505a5f; font-size: 1rem; line-height: 1.25; margin-top: 5px; }
+
+/* Who you are signed in as, on every page */
+.app-signed-in { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 0; }
+.app-signed-in__change { margin-left: auto; }

@@ -1,4 +1,6 @@
+@inject Share.Web.Users.CurrentUser CurrentUser
 @{
+    var signedInAs = CurrentUser.User;
     var path = Context.Request.Path.Value ?? "/";
     bool Active(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
 }
@@ -65,6 +67,13 @@
                 <span class="govuk-phase-banner__text">This is a hackathon rebuild. All data is synthetic.</span>
             </p>
         </div>
+        <section aria-label="Who you are signed in as">
+            <p class="govuk-body-s app-signed-in" id="signed-in-as">
+                Signed in as <strong>@signedInAs.Name</strong>
+                <strong class="govuk-tag @(signedInAs.IsAdmin ? "govuk-tag--purple" : "govuk-tag--turquoise")">@(signedInAs.IsAdmin ? "All councils" : Display.Council(signedInAs.Council))</strong>
+                <a class="govuk-link app-signed-in__change" href="/Admin#user">Change user<span class="govuk-visually-hidden"> (demo controls)</span></a>
+            </p>
+        </section>
         @await RenderSectionAsync("BeforeContent", required: false)
         <main class="govuk-main-wrapper" id="main-content">
             @RenderBody()

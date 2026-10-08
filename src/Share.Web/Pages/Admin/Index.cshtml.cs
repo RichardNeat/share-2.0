@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Share.Web.Data;
 using Share.Web.Ingest;
 using Share.Web.Models;
+using Share.Web.Users;
 
 namespace Share.Web.Pages.Admin;
 
-public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder, DataFiles files) : PageModel
+public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder, DataFiles files, CurrentUser currentUser) : PageModel
 {
     [TempData] public string? Message { get; set; }
     [TempData] public string? Error { get; set; }
@@ -15,6 +16,7 @@ public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder
     public IReadOnlyList<DataFile> Files { get; private set; } = [];
     public DataFile? NextFile { get; private set; }
     public List<IngestRun> Runs { get; private set; } = [];
+    public DemoUser SignedInAs => currentUser.User;
 
     public async Task OnGetAsync()
     {
@@ -40,6 +42,18 @@ public class IndexModel(AppDbContext db, IngestService ingest, DemoSeeder seeder
             Error = e.Message;
             return RedirectToPage();
         }
+    }
+
+    public IActionResult OnPostSwitchUser(string? user)
+    {
+        if (DemoUser.Find(user) is not { } chosen)
+        {
+            Error = "Select who to sign in as";
+            return RedirectToPage();
+        }
+        currentUser.SignInAs(chosen);
+        Message = $"You are now signed in as {chosen.Name}";
+        return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostSeedAsync(int through)

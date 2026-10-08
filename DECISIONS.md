@@ -208,3 +208,35 @@ A running timeline of the major decisions made while building this service, olde
 - **Why:** The team asked us to avoid JavaScript where we can, for accessibility. GOV.UK Frontend is built to work without it, and every page is server-rendered
 - **What:** Removed the GOV.UK Frontend script and `initAll`, the `js-enabled` body class, every `data-module` hook, the mobile "Menu" button, and our table script. On a phone the navigation shows as a plain list. Error summaries and banners still announce through `role="alert"`, and their links still go to the fields. Each wide table is now always a labelled, keyboard-reachable region (the standard no-JavaScript pattern), at the cost of one extra tab stop per table on desktop. The accessibility statement says the service uses no JavaScript
 - **Replaces:** the "table is a tab stop only when it scrolls" part of decision 30, which needed a script
+
+## 2026-10-08 · M6 Who sees what
+
+### 39. Three demo users, chosen on the demo controls page and remembered in a cookie
+
+- **Why:** The brief rules out real authentication. A "User type" choice on the demo controls page is one click during the demo, and a cookie keeps it across pages without any sign-in machinery
+- **What:** Central admin (sees everything), Birmingham council user and Exeter council user. With no cookie, and for console commands and seeding, the user is the central admin, so nothing changes for anyone who never switches. Every page shows who you are signed in as, with a tag for the council and a "Change user" link back to the demo controls
+- **Turned down:** a login screen, and a user picker in the header, which would crowd it. We also did not hide the demo controls from council users: anyone must be able to drive the demo
+
+### 40. Row-level scoping is done once, as EF Core global query filters on the database context
+
+- **Why:** The brief says scoping runs through every list, detail page and search. Filtering in each page would be easy to forget on the next page we add. A global filter means every query is scoped, including counts on the home page, related records on detail pages, and searches when we build them
+- **What:** An application, its guests and its timeline events belong to the application's council (the accommodation address, the same council as their case). An accommodation belongs to its own council. A sponsor or host belongs to every council they have an application in, and their page lists only the applications in yours. A record with no council is seen by the central admin only
+- **Turned down:** a `Where` on each page, and a separate council column on guests and people, which would copy data we already hold
+
+### 41. Another council's record is "Page not found", not "Forbidden"
+
+- **Why:** Saying "you can't see this" confirms the record exists. Because of the filters, the record simply isn't found, and the page returns 404 with a GOV.UK "Page not found" page that points to the demo controls to change user
+
+### 42. Ingest ignores the scoping; the ingest summary is scoped
+
+- **Why:** Matching sponsors, accommodations and repeat submissions must see every council's records, or a council user clicking "Process next file" would create duplicates. The "What changed" list on the ingest page only links to records you can open, with a note saying so; the counts cover the whole file
+
+### 43. Cases are scoped by their own council (after merging M3)
+
+- **Why:** M3 landed on main while M6 was on its branch. A case carries its council (from the accommodation), so it gets the same filter as everything else, and the Cases list, case pages and the home page count are scoped with no page changes
+- **What:** A "Case formed" event is seen only by the case's council, as "Application received" events are by the application's. Ingest also reads cases with the filters off, so a council user processing a file never creates a duplicate case
+
+### 44. Safeguarding checks are scoped through their case (after merging M4)
+
+- **Why:** A check has no council of its own. Checks are only ever loaded with their case, which is filtered, so viewing or updating a check on another council's case is "Page not found". "Check updated" and "Case status changed" events carry the case, so the event filter scopes them too
+- **Turned down:** a separate filter on checks, which would repeat the case's council for no gain

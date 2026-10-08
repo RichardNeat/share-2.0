@@ -15,6 +15,29 @@
 }
 <h1 class="govuk-heading-l">Demo controls</h1>
 
+<h2 class="govuk-heading-m" id="user">User type</h2>
+<p class="govuk-body">There is no real sign in. Choose who to be: a council user sees only their council's applications, guests, sponsors, hosts and accommodations. The central admin sees everything.</p>
+<form method="post" asp-page-handler="SwitchUser" novalidate>
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Sign in as</legend>
+            <div class="govuk-radios" data-module="govuk-radios">
+                @foreach (var u in DemoUser.All)
+                {
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="user-@u.Key" name="user" type="radio" value="@u.Key" checked="@(u == Model.SignedInAs)" aria-describedby="user-@u.Key-hint" />
+                        <label class="govuk-label govuk-radios__label" for="user-@u.Key">@u.Name</label>
+                        <div id="user-@u.Key-hint" class="govuk-hint govuk-radios__hint">@u.Sees</div>
+                    </div>
+                }
+            </div>
+        </fieldset>
+    </div>
+    <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">Switch user</button>
+</form>
+
+<h2 class="govuk-heading-m">Data files</h2>
+
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Files processed</dt><dd class="govuk-summary-list__value">@Model.Runs.Count of @Model.Files.Count</dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Next file</dt><dd class="govuk-summary-list__value">@(Model.NextFile?.Name ?? "All files processed")</dd></div>
