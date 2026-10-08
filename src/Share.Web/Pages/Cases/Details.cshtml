@@ -10,11 +10,15 @@
 @section BeforeContent {
     <a href="/Cases" class="govuk-back-link">Back to cases</a>
 }
+<partial name="_SuccessBanner" model="Model.Message" />
 <span class="govuk-caption-l">Case @c.Reference</span>
 <h1 class="govuk-heading-l">@c.Title</h1>
 
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Status</dt><dd class="govuk-summary-list__value"><partial name="_CaseStatusTag" model="c.Status" /></dd></div>
+    <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Status</dt><dd class="govuk-summary-list__value">
+            <partial name="_CaseStatusTag" model="Model.Assessment.Status" />
+            @if (Model.Assessment.EnhancedDbsRequired) { <partial name="_EnhancedDbsTag" /> }
+        </dd></div>
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Council</dt><dd class="govuk-summary-list__value">@Display.Council(c.Council)</dd></div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Sponsor</dt>
@@ -55,6 +59,57 @@
             }
         </dd>
     </div>
+</dl>
+
+<h2 class="govuk-heading-m" id="checks">Safeguarding checks</h2>
+@if (Model.Assessment.EnhancedDbsRequired)
+{
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            Enhanced DBS required. This case has a guest under 18:
+            @string.Join(", ", Model.Assessment.Children.Select(g => $"{g.FullName} ({Ages.On(g.DateOfBirth!.Value, Model.Today)})")).
+            The DBS check must be an Enhanced DBS. A standard DBS does not complete it.
+        </strong>
+    </div>
+}
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    @foreach (var check in Model.Assessment.Checks)
+    {
+        <div class="govuk-summary-list__row @(check.Locked ? "govuk-summary-list__row--no-actions" : "")">
+            <dt class="govuk-summary-list__key">@((int)check.Kind). @Display.CheckName(check.Kind)</dt>
+            <dd class="govuk-summary-list__value">
+                @if (check.Locked)
+                {
+                    <partial name="_CheckStatusTag" model="check.Recorded" />
+                    <p class="govuk-body-s app-secondary-text">Available when guests arrive</p>
+                }
+                else
+                {
+                    <partial name="_CheckStatusTag" model="check.Effective" />
+                    @if (check.DbsType is { } dbs)
+                    {
+                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">@Display.DbsTypeName(dbs)</p>
+                    }
+                    @if (check.FailureReason is { } reason)
+                    {
+                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Reason: @reason</p>
+                    }
+                    @if (check.Note is { } note)
+                    {
+                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><strong>@note</strong></p>
+                    }
+                }
+            </dd>
+            @if (!check.Locked)
+            {
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update<span class="govuk-visually-hidden"> @Display.CheckName(check.Kind).ToLowerInvariant()</span></a>
+                </dd>
+            }
+        </div>
+    }
 </dl>
 
 <h2 class="govuk-heading-m">Guests (@guests.Count)</h2>

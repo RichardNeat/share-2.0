@@ -15,10 +15,11 @@ builder.Services.AddSingleton(new DataFiles(Path.GetFullPath(dataDirectory)));
 
 builder.Services.AddSingleton<TimeProvider>(
     DateOnly.TryParse(builder.Configuration["Clock:Today"], out var today)
-        ? new FixedTimeProvider(new DateTimeOffset(today.ToDateTime(new TimeOnly(12, 0)), TimeSpan.Zero))
+        ? new FixedDateTimeProvider(today)
         : TimeProvider.System);
 builder.Services.AddScoped<IngestService>();
 builder.Services.AddScoped<DemoSeeder>();
+builder.Services.AddScoped<Share.Web.Safeguarding.CheckService>();
 
 var app = builder.Build();
 

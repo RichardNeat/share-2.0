@@ -51,7 +51,7 @@ public class CasesJourneyTests : IClassFixture<AppFactory>
         Assert.Equal("3", cells[1]);
         Assert.Equal("10", cells[2]);
         Assert.Equal("Exeter", cells[3]);
-        Assert.Equal("Checks required", cells[4]);
+        Assert.Equal("Checks required", melnyk.QuerySelectorAll("td")[4].QuerySelector(".govuk-tag")!.TextContent.Trim());
         Assert.Contains(rows, r => Text(r.QuerySelector("a")) == "Kovalenko and Lysenko households");
     }
 

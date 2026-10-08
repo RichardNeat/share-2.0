@@ -1,0 +1,3 @@
+@model CheckStatus
+@{ var (text, css) = Display.CheckStatusTag(Model); }
+<strong class="govuk-tag @css">@text</strong>

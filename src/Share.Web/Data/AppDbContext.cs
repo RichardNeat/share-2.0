@@ -27,6 +27,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         });
         b.Entity<Guest>().HasIndex(p => p.Gwf);
         b.Entity<TimelineEvent>().Property(t => t.Kind).HasConversion<string>();
+        b.Entity<CaseCheck>(e =>
+        {
+            e.HasIndex(x => new { x.CaseId, x.Kind }).IsUnique();
+            e.Property(x => x.Kind).HasConversion<string>();
+            e.Property(x => x.Status).HasConversion<string>();
+            e.Property(x => x.DbsType).HasConversion<string>();
+        });
         b.Entity<IngestRun>().HasIndex(r => r.FileName).IsUnique();
         b.Entity<Person>().HasIndex(x => x.MatchKey).IsUnique();
         b.Entity<Accommodation>().HasIndex(x => x.MatchKey).IsUnique();
@@ -34,6 +41,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.HasIndex(c => c.MatchKey).IsUnique();
             e.Ignore(c => c.Guests);
+            e.HasMany(c => c.Checks).WithOne().HasForeignKey(x => x.CaseId);
         });
     }
 }

@@ -4,6 +4,8 @@ public enum TimelineEventKind
 {
     ApplicationReceived,
     CaseFormed,
+    CheckUpdated,
+    CaseStatusChanged,
 }
 
 // One log of meaningful changes. Feeds the ingest summary now and the case timeline (M5).

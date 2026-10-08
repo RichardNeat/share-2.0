@@ -45,6 +45,27 @@ public static class Display
         _ => (status.ToString(), "govuk-tag--grey"),
     };
 
+    public static string CheckName(CheckKind kind) => kind switch
+    {
+        CheckKind.AccommodationExists => "Accommodation exists",
+        CheckKind.AccommodationSuitable => "Accommodation suitable",
+        CheckKind.DbsAndSponsorSuitable => "DBS check and sponsor suitable",
+        CheckKind.GuestsArrived => "Guests have arrived in their accommodation",
+        _ => kind.ToString(),
+    };
+
+    public static (string Text, string Css) CheckStatusTag(CheckStatus status) => status switch
+    {
+        CheckStatus.NotStarted => ("Not started", "govuk-tag--grey"),
+        CheckStatus.InProgress => ("In progress", "govuk-tag--light-blue"),
+        CheckStatus.Passed => ("Passed", "govuk-tag--green"),
+        CheckStatus.Failed => ("Failed", "govuk-tag--red"),
+        CheckStatus.NoLongerRequired => ("No longer required", "govuk-tag--blue"),
+        _ => (status.ToString(), "govuk-tag--grey"),
+    };
+
+    public static string DbsTypeName(DbsType type) => type == DbsType.Enhanced ? "Enhanced DBS" : "Standard DBS";
+
     public static string Age(DateOnly? dateOfBirth, DateOnly today) =>
         dateOfBirth is { } dob ? $"{Ages.On(dob, today)}" : "Not given";
 }

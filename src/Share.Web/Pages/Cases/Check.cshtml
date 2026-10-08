@@ -1,0 +1,109 @@
+@page "/Cases/{id:int}/Checks/{kind:int}"
+@model Share.Web.Pages.Cases.CheckModel
+@{
+    var name = Display.CheckName(Model.Kind);
+    ViewData["Title"] = (Model.Errors.Count > 0 ? "Error: " : "") + $"{name} – case {Model.Case.Reference}";
+    var statusError = Model.ErrorFor("Status");
+    var reasonError = Model.ErrorFor("FailureReason");
+    var dbsError = Model.ErrorFor("DbsType");
+    var statuses = new[] { CheckStatus.NotStarted, CheckStatus.InProgress, CheckStatus.Passed, CheckStatus.Failed, CheckStatus.NoLongerRequired };
+    var firstStatusId = "Status";
+}
+@section BeforeContent {
+    <a href="/Cases/@Model.Case.Id" class="govuk-back-link">Back to case</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @if (Model.Errors.Count > 0)
+        {
+            <div class="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <ul class="govuk-list govuk-error-summary__list">
+                            @foreach (var e in Model.Errors)
+                            {
+                                <li><a href="#@e.Field">@e.Message</a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <form method="post" novalidate>
+            <div class="govuk-form-group @(statusError is null ? "" : "govuk-form-group--error")">
+                <fieldset class="govuk-fieldset" aria-describedby="status-hint@(statusError is null ? "" : " status-error")">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <span class="govuk-caption-l">Case @Model.Case.Reference · @Model.Case.Title</span>
+                        <h1 class="govuk-fieldset__heading">@((int)Model.Kind). @name</h1>
+                    </legend>
+                    <div id="status-hint" class="govuk-hint">Select the status of this check.</div>
+                    @if (statusError is not null)
+                    {
+                        <p id="status-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> @statusError</p>
+                    }
+                    <div class="govuk-radios">
+                        @foreach (var s in statuses)
+                        {
+                            var inputId = s == statuses[0] ? firstStatusId : $"Status-{s}";
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="@inputId" name="Status" type="radio" value="@s" checked="@(Model.Status == s)" />
+                                <label class="govuk-label govuk-radios__label" for="@inputId">@Display.CheckStatusTag(s).Text</label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group @(reasonError is null ? "" : "govuk-form-group--error")">
+                <label class="govuk-label govuk-label--m" for="FailureReason">Why did the check fail?</label>
+                <div id="reason-hint" class="govuk-hint">Only needed if the check failed.</div>
+                @if (reasonError is not null)
+                {
+                    <p id="reason-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> @reasonError</p>
+                }
+                <textarea class="govuk-textarea @(reasonError is null ? "" : "govuk-textarea--error")" id="FailureReason" name="FailureReason" rows="3"
+                          aria-describedby="reason-hint@(reasonError is null ? "" : " reason-error")">@Model.FailureReason</textarea>
+            </div>
+
+            @if (Model.Kind == CheckKind.DbsAndSponsorSuitable)
+            {
+                <div class="govuk-form-group @(dbsError is null ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset" aria-describedby="dbs-hint@(dbsError is null ? "" : " dbs-error")">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Type of DBS check</legend>
+                        <div id="dbs-hint" class="govuk-hint">
+                            @if (Model.EnhancedDbsRequired)
+                            {
+                                @:This case has a guest under 18, so the check needs an Enhanced DBS. A standard DBS does not complete it.
+                            }
+                            else
+                            {
+                                @:Needed when you mark the check as passed.
+                            }
+                        </div>
+                        @if (dbsError is not null)
+                        {
+                            <p id="dbs-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> @dbsError</p>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="DbsType" name="DbsType" type="radio" value="Standard" checked="@(Model.DbsType == DbsType.Standard)" />
+                                <label class="govuk-label govuk-radios__label" for="DbsType">Standard DBS</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="DbsType-Enhanced" name="DbsType" type="radio" value="Enhanced" checked="@(Model.DbsType == DbsType.Enhanced)" />
+                                <label class="govuk-label govuk-radios__label" for="DbsType-Enhanced">Enhanced DBS</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            }
+
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button">Save check</button>
+                <a class="govuk-link" href="/Cases/@Model.Case.Id">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

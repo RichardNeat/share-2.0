@@ -35,7 +35,8 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
   `dotnet aspnet-codegenerator razorpage -m <Model> -dc <Namespace>.AppDbContext -udl -outDir Pages/<Models> --databaseProvider sqlite`
 - After a model change: `dotnet ef migrations add <Name>` then `dotnet ef database update`
 - `dotnet new sln` now creates `Share.slnx` (fine). Layout: `src/Share.Web` (Razor Pages) and `tests/Share.Tests` (xUnit) referencing it. Setup takes about 20 seconds with a warm NuGet cache
-- Delete the template's `wwwroot/lib` (Bootstrap/jQuery), `_Layout.cshtml.css` and the Privacy page. Load GOV.UK Frontend JS as a module from the same CDN (`.../govuk-frontend.min.js`, `initAll()`), and add the `js-enabled govuk-frontend-supported` body class script. Fonts resolve from the CDN without extra setup
+- Delete the template's `wwwroot/lib` (Bootstrap/jQuery), `_Layout.cshtml.css` and the Privacy page. Fonts resolve from the CDN without extra setup
+- **No JavaScript.** Do not load GOV.UK Frontend JS, add `data-module` hooks, or write page scripts. Every component must work as plain HTML (no conditional reveals, no JS toggles). The team decided this for accessibility
 - Read the connection string from `ConnectionStrings:Default`, falling back to `Data Source=app.db`, and call `Database.Migrate()` at startup so tests can point at their own db file
 - Add `public partial class Program;` at the bottom of `Program.cs` so `WebApplicationFactory<Program>` can see it
 - The scaffolder emits **Bootstrap markup** (`form-control`, `btn`, `h4` that skips heading levels) and Create/Edit/Delete pages we do not want (records only arrive from files). Prefer writing GOV.UK list/detail pages directly, using shared partials (status tag, summary list). If you do scaffold, convert the output to GOV.UK markup before moving on
@@ -52,6 +53,7 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 
 ## Working agreement
 
+- **Other people are pushing to this repo at the same time.** Before every commit and push: `git pull --rebase origin main` (stash uncommitted work first if needed), resolve every conflict properly by reading both sides and keeping both teams' intent, then rebuild and run the full test suite before pushing. Never force-push, and never resolve a conflict by blindly taking one side. EF migrations: if both sides added migrations, keep both migration files, then regenerate the model snapshot (`dotnet ef migrations add` on top, or remove and re-add ours) so the snapshot matches the merged model, and check `dotnet ef database update` works on a fresh database
 - Never `git commit` without being asked. After each milestone: run the tests, list how to check each acceptance criterion, and suggest a commit message
 - **Keep `DECISIONS.md` up to date.** Every time you make a major decision (a data model, a matching or status rule, a library, a trade-off, a change of plan, or anything you chose not to do), add a numbered entry at the bottom under a dated heading for the milestone. Each entry says what you decided, why, and what you turned down. Update it after every implementation, before suggesting the commit, so it goes into the same commit. Add entries only; never rewrite earlier ones. If a decision is reversed, add a new entry that names the earlier one
 - Accessibility and GDS patterns come first: one h1, labelled inputs, keyboard-reachable actions, and statuses as GOV.UK tags with words (never colour alone)

@@ -53,8 +53,4 @@ public class CaseFormationTests
         var c = new Case { MatchKey = "k", Applications = [App(7, "Lysenko", 30), App(1, "Kovalenko", 0)] };
         Assert.Equal("Kovalenko and Lysenko households", c.Title);
     }
-
-    [Fact]
-    public void Status_is_checks_required_until_checks_exist() =>
-        Assert.Equal(CaseStatus.ChecksRequired, new Case { MatchKey = "k" }.Status);
 }

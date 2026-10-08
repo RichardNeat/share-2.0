@@ -169,3 +169,42 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** Every GOV.UK service has one, and the scoring criteria reward a true sentence about accessibility
 - **What:** It claims only what we have done and tested, says plainly that no specialist audit or assistive technology testing has happened, and lists the known issue
+
+## 2026-10-08 · M4 Safeguarding checks
+
+### 32. Case status is derived on every read by one pure function, never stored
+
+- **Why:** The brief says the status recalculates whenever a check changes. Deriving it each time means it can never go stale, and the rule lives in one place (`SafeguardingRules.Derive`) with a unit test for every branch, in the brief's order: any failed check; all four done; checks 1 to 3 done; at least one passed; otherwise checks required
+- **What:** "Done" means Passed or No Longer Required. "No longer required" on its own is not a pass, so it doesn't make a case "Checks partially completed"
+
+### 33. A check gets a database row only when someone first updates it
+
+- **Why:** No rows to create at ingest, nothing to backfill for existing cases, and a missing row simply reads "Not started"
+- **What:** At most one row per case and check (a unique index). A failure reason is stored only while the check is Failed. A DBS type is stored only on check 3
+
+### 34. The Enhanced DBS rule works in three places
+
+- **Shown:** A case with any guest under 18 (on the pinned date) shows an orange "Enhanced DBS required" tag next to its status, on both the case list and the case page. The case page also has a warning naming each child and their age
+- **Enforced:** Marking check 3 as passed requires a DBS type. On a case with a child, choosing "Standard DBS" is refused with an error
+- **Re-checked:** If check 3 passed with a standard DBS and a child is later on the case, that pass counts as "In progress" and the case page says why. A standard DBS never completes check 3 on such a case, even after the fact
+
+### 35. Check 4 is locked until a guest on the case has arrived
+
+- **Why:** The brief says arrivals unlock it (M5). The rule is "any application on the case has visa status Arrived", already unit-tested, so M5 only has to set that status
+- **What:** Check 4 shows "Available when guests arrive" with no Update link, and its update page redirects back to the case
+- **Open for M5:** if arrivals turn out to be per person (the arrivals file has `PERSON_IDENTIFIER`), decide whether the first arrival unlocks the check or the whole household
+
+### 36. Check updates write "Check updated" and "Case status changed" events
+
+- **Why:** They feed the M5 timeline. A status change is only logged when the derived status actually moves
+- **What:** The pinned clock now fixes only the date. Times on user actions use the real time of day, so timeline entries made during a demo show sensible times
+
+### 37. No conditional reveal on the check form: the failure reason is a plain field
+
+- **Why:** GOV.UK Frontend's script adds `aria-expanded` to the radio that reveals extra content, and axe flags that as a critical ARIA error. A plain textarea with the hint "Only needed if the check failed" is simpler, has no ARIA problem, and works without JavaScript
+
+### 38. The service uses no JavaScript at all
+
+- **Why:** The team asked us to avoid JavaScript where we can, for accessibility. GOV.UK Frontend is built to work without it, and every page is server-rendered
+- **What:** Removed the GOV.UK Frontend script and `initAll`, the `js-enabled` body class, every `data-module` hook, the mobile "Menu" button, and our table script. On a phone the navigation shows as a plain list. Error summaries and banners still announce through `role="alert"`, and their links still go to the fields. Each wide table is now always a labelled, keyboard-reachable region (the standard no-JavaScript pattern), at the cost of one extra tab stop per table on desktop. The accessibility statement says the service uses no JavaScript
+- **Replaces:** the "table is a tab stop only when it scrolls" part of decision 30, which needed a script

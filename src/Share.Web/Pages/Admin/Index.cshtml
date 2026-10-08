@@ -4,7 +4,7 @@
 <partial name="_SuccessBanner" model="Model.Message" />
 @if (!string.IsNullOrEmpty(Model.Error))
 {
-    <div class="govuk-notification-banner" role="region" aria-labelledby="important-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner" role="region" aria-labelledby="important-banner-title">
         <div class="govuk-notification-banner__header">
             <h2 class="govuk-notification-banner__title" id="important-banner-title">Important</h2>
         </div>
@@ -21,7 +21,7 @@
 </dl>
 
 <form method="post" asp-page-handler="ProcessNext">
-    <button type="submit" class="govuk-button" data-module="govuk-button" disabled="@(Model.NextFile is null)">Process next file</button>
+    <button type="submit" class="govuk-button" disabled="@(Model.NextFile is null)">Process next file</button>
 </form>
 
 <h2 class="govuk-heading-m">Reset the demo</h2>
@@ -37,11 +37,11 @@
         </select>
     </div>
     <div class="govuk-button-group">
-        <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">Reset and load</button>
+        <button type="submit" class="govuk-button govuk-button--secondary">Reset and load</button>
     </div>
 </form>
 <form method="post" asp-page-handler="Reset">
-    <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">Reset to empty</button>
+    <button type="submit" class="govuk-button govuk-button--warning">Reset to empty</button>
 </form>
 
 <h2 class="govuk-heading-m">Ingest history</h2>

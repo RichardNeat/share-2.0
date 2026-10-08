@@ -22,7 +22,7 @@ else
             </tr>
         </thead>
         <tbody class="govuk-table__body">
-            @foreach (var c in Model.Cases)
+            @foreach (var (c, assessment) in Model.Cases)
             {
                 var youngest = c.Guests.Where(g => g.DateOfBirth != null).MaxBy(g => g.DateOfBirth);
                 <tr class="govuk-table__row">
@@ -33,7 +33,10 @@ else
                     <td class="govuk-table__cell govuk-table__cell--numeric">@c.Guests.Count()</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric">@Display.Age(youngest?.DateOfBirth, Model.Today)</td>
                     <td class="govuk-table__cell">@Display.Council(c.Council)</td>
-                    <td class="govuk-table__cell"><partial name="_CaseStatusTag" model="c.Status" /></td>
+                    <td class="govuk-table__cell">
+                        <partial name="_CaseStatusTag" model="assessment.Status" />
+                        @if (assessment.EnhancedDbsRequired) { <br /><partial name="_EnhancedDbsTag" /> }
+                    </td>
                 </tr>
             }
         </tbody>

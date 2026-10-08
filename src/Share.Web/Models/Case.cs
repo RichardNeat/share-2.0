@@ -11,6 +11,7 @@ public class Case
     public Accommodation? Accommodation { get; set; }
     public string? Council { get; set; }
     public List<VisaApplication> Applications { get; set; } = [];
+    public List<CaseCheck> Checks { get; set; } = [];
 
     // Deterministic: Ids are assigned in ingest order on an empty database.
     public string Reference => $"CASE-{Id:D4}";
@@ -31,9 +32,6 @@ public class Case
             };
         }
     }
-
-    // M4 derives this from the four safeguarding checks. With no checks recorded, the rule gives Checks Required.
-    public CaseStatus Status => CaseStatus.ChecksRequired;
 }
 
 public enum CaseStatus
