@@ -20,6 +20,8 @@ public class VisaApplication
     public Person? Host { get; set; }
     public int? AccommodationId { get; set; }
     public Accommodation? Accommodation { get; set; }
+    public int? CaseId { get; set; }
+    public Case? Case { get; set; }
     public int IngestRunId { get; set; }
     public IngestRun? IngestRun { get; set; }
     public List<Guest> Guests { get; set; } = [];

@@ -4,10 +4,12 @@
 <partial name="_SuccessBanner" model="Model.Message" />
 @if (!string.IsNullOrEmpty(Model.Error))
 {
-    <div class="govuk-error-summary" data-module="govuk-error-summary">
-        <div role="alert">
-            <h2 class="govuk-error-summary__title">There is a problem</h2>
-            <div class="govuk-error-summary__body"><p class="govuk-body govuk-!-margin-bottom-0">@Model.Error</p></div>
+    <div class="govuk-notification-banner" role="region" aria-labelledby="important-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="important-banner-title">Important</h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">@Model.Error</p>
         </div>
     </div>
 }
@@ -72,9 +74,9 @@
 }
 else
 {
-    <div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="ingest-history-caption">
     <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-visually-hidden">Files processed, in order</caption>
+        <caption id="ingest-history-caption" class="govuk-table__caption govuk-visually-hidden">Files processed, in order</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">File</th>

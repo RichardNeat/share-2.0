@@ -1,0 +1,42 @@
+@page
+@model Share.Web.Pages.Cases.IndexModel
+@{ ViewData["Title"] = "Cases"; }
+<h1 class="govuk-heading-l">Cases</h1>
+<p class="govuk-body">Each case is the guests heading to the same sponsor and address, worked as one household.</p>
+@if (Model.Cases.Count == 0)
+{
+    <p class="govuk-body">No cases yet. Process a data file from the <a class="govuk-link" href="/Admin">demo controls</a>.</p>
+}
+else
+{
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="cases-caption">
+    <table class="govuk-table">
+        <caption id="cases-caption" class="govuk-table__caption govuk-table__caption--m">@Model.Cases.Count case@(Model.Cases.Count == 1 ? "" : "s")</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Case</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">People</th>
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">Youngest age</th>
+                <th scope="col" class="govuk-table__header">Council</th>
+                <th scope="col" class="govuk-table__header">Status</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var c in Model.Cases)
+            {
+                var youngest = c.Guests.Where(g => g.DateOfBirth != null).MaxBy(g => g.DateOfBirth);
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" href="/Cases/@c.Id">@c.Title</a>
+                        <span class="app-secondary-text">@c.Reference@(c.Accommodation is { } a ? $" · {a.Address}" : "")</span>
+                    </td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@c.Guests.Count()</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">@Display.Age(youngest?.DateOfBirth, Model.Today)</td>
+                    <td class="govuk-table__cell">@Display.Council(c.Council)</td>
+                    <td class="govuk-table__cell"><partial name="_CaseStatusTag" model="c.Status" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}

@@ -30,9 +30,9 @@
 }
 else
 {
-    <div class="app-table-wrapper" tabindex="0" role="region" aria-label="Scrollable table">
+    <div class="app-table-wrapper" tabindex="0" role="region" aria-labelledby="applications-caption">
     <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">@Model.Applications.Count application@(Model.Applications.Count == 1 ? "" : "s")@(Model.Status is null ? "" : $" with status {Display.VisaStatusTag(Model.Status.Value).Text}")</caption>
+        <caption id="applications-caption" class="govuk-table__caption govuk-table__caption--m">@Model.Applications.Count application@(Model.Applications.Count == 1 ? "" : "s")@(Model.Status is null ? "" : $" with status {Display.VisaStatusTag(Model.Status.Value).Text}")</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Applicant</th>

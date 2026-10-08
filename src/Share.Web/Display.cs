@@ -34,4 +34,17 @@ public static class Display
         VisaStatus.Refused => ("Refused", "govuk-tag--red"),
         _ => (status.ToString(), "govuk-tag--grey"),
     };
+
+    public static (string Text, string Css) CaseStatusTag(CaseStatus status) => status switch
+    {
+        CaseStatus.ChecksRequired => ("Checks required", "govuk-tag--grey"),
+        CaseStatus.ChecksPartiallyCompleted => ("Checks partially completed", "govuk-tag--yellow"),
+        CaseStatus.PreArrivalChecksComplete => ("Pre-arrival checks complete", "govuk-tag--blue"),
+        CaseStatus.ChecksCompleted => ("Checks completed", "govuk-tag--green"),
+        CaseStatus.SomeChecksFailed => ("Some checks failed", "govuk-tag--red"),
+        _ => (status.ToString(), "govuk-tag--grey"),
+    };
+
+    public static string Age(DateOnly? dateOfBirth, DateOnly today) =>
+        dateOfBirth is { } dob ? $"{Ages.On(dob, today)}" : "Not given";
 }

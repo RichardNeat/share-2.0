@@ -35,6 +35,9 @@
                 <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
                     <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden>Menu</button>
                     <ul class="govuk-service-navigation__list" id="navigation">
+                        <li class="govuk-service-navigation__item @(Active("/Cases") ? "govuk-service-navigation__item--active" : "")">
+                            <a class="govuk-service-navigation__link" href="/Cases" @(Active("/Cases") ? "aria-current=page" : "")>Cases</a>
+                        </li>
                         <li class="govuk-service-navigation__item @(Active("/Applications") ? "govuk-service-navigation__item--active" : "")">
                             <a class="govuk-service-navigation__link" href="/Applications" @(Active("/Applications") ? "aria-current=page" : "")>Applications</a>
                         </li>
@@ -66,11 +69,13 @@
                 <span class="govuk-phase-banner__text">This is a hackathon rebuild. All data is synthetic.</span>
             </p>
         </div>
-        <p class="govuk-body-s app-signed-in" id="signed-in-as">
-            Signed in as <strong>@signedInAs.Name</strong>
-            <strong class="govuk-tag @(signedInAs.IsAdmin ? "govuk-tag--purple" : "govuk-tag--turquoise")">@(signedInAs.IsAdmin ? "All councils" : Display.Council(signedInAs.Council))</strong>
-            <a class="govuk-link app-signed-in__change" href="/Admin#user">Change user<span class="govuk-visually-hidden"> (demo controls)</span></a>
-        </p>
+        <section aria-label="Who you are signed in as">
+            <p class="govuk-body-s app-signed-in" id="signed-in-as">
+                Signed in as <strong>@signedInAs.Name</strong>
+                <strong class="govuk-tag @(signedInAs.IsAdmin ? "govuk-tag--purple" : "govuk-tag--turquoise")">@(signedInAs.IsAdmin ? "All councils" : Display.Council(signedInAs.Council))</strong>
+                <a class="govuk-link app-signed-in__change" href="/Admin#user">Change user<span class="govuk-visually-hidden"> (demo controls)</span></a>
+            </p>
+        </section>
         @await RenderSectionAsync("BeforeContent", required: false)
         <main class="govuk-main-wrapper" id="main-content">
             @RenderBody()
@@ -81,11 +86,28 @@
         <div class="govuk-width-container">
             <div class="govuk-footer__meta">
                 <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <h2 class="govuk-visually-hidden">Support links</h2>
+                    <ul class="govuk-footer__inline-list">
+                        <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/Accessibility">Accessibility statement</a></li>
+                    </ul>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Homes for Ukraine casework. Hackathon 2026. Every name and record is invented.</p>
                 </div>
             </div>
         </div>
     </footer>
+    <script>
+        // A table box only needs to be a keyboard stop (and a labelled region) when it actually scrolls.
+        (function () {
+            function update() {
+                document.querySelectorAll('.app-table-wrapper').forEach(function (w) {
+                    if (w.scrollWidth > w.clientWidth) { w.setAttribute('tabindex', '0'); w.setAttribute('role', 'region'); }
+                    else { w.removeAttribute('tabindex'); w.removeAttribute('role'); }
+                });
+            }
+            update();
+            window.addEventListener('resize', update);
+        })();
+    </script>
     <script type="module">
         import { initAll } from 'https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.js';
         initAll();

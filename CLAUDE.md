@@ -48,12 +48,18 @@ Milestones are in `~/Dev/hfu-hackathon-2026/MILESTONES.md` (M1 to M5, in order) 
 - Every page gets the shared accessibility assertions: a non-empty `<title>`, exactly one `h1`, the skip link to `#main-content`, and a `label[for]` for every visible input, select and textarea
 - Run the full suite (unit and journey tests, `dotnet test` from the repo root) after every major change, meaning whenever you reach a point you would be ready to commit. Not after every minor edit
 - Always run it before you say a milestone is done
+- Before suggesting a milestone commit, also run the accessibility audit against the running app on every page the milestone touched: `node --experimental-websocket tools/a11y-audit.mjs / /Cases /Cases/1 ...`. It runs axe-core (WCAG 2.2 AA plus best practice) at 1280px and 390px and reports sideways overflow. The only accepted finding is `region` on the phase banner and back links (GOV.UK places them outside `main`)
 
 ## Working agreement
 
 - Never `git commit` without being asked. After each milestone: run the tests, list how to check each acceptance criterion, and suggest a commit message
 - **Keep `DECISIONS.md` up to date.** Every time you make a major decision (a data model, a matching or status rule, a library, a trade-off, a change of plan, or anything you chose not to do), add a numbered entry at the bottom under a dated heading for the milestone. Each entry says what you decided, why, and what you turned down. Update it after every implementation, before suggesting the commit, so it goes into the same commit. Add entries only; never rewrite earlier ones. If a decision is reversed, add a new entry that names the earlier one
 - Accessibility and GDS patterns come first: one h1, labelled inputs, keyboard-reachable actions, and statuses as GOV.UK tags with words (never colour alone)
+
+## Terminology
+
+- A household's unit of casework is a **case**, everywhere: code, database, URLs, page text and references (`CASE-0003`). Never use "accommodation request" or `AccommodationRequest`, even though the brief uses it as a synonym
+- Sponsor and host are different roles held by a `Person`: the sponsor backs the visa, the host is whoever the guests live with. Guests are separate records
 
 ## Looks: a real GOV.UK service at all times
 

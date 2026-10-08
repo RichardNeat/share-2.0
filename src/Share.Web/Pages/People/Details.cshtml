@@ -38,12 +38,12 @@ else
 @if (p.IsSponsor)
 {
     <h2 class="govuk-heading-m">Guests they sponsor (@Model.SponsoredGuests.Count)</h2>
-    <partial name="_GuestsTable" model="Model.SponsoredGuests" />
+    <partial name="_GuestsTable" model="Model.SponsoredGuests" view-data='new ViewDataDictionary(ViewData) { ["Caption"] = "Guests they sponsor", ["CaptionId"] = "sponsored-guests-caption" }' />
 }
 @if (p.IsHost)
 {
     <h2 class="govuk-heading-m">Guests they host (@Model.HostedGuests.Count)</h2>
-    <partial name="_GuestsTable" model="Model.HostedGuests" />
+    <partial name="_GuestsTable" model="Model.HostedGuests" view-data='new ViewDataDictionary(ViewData) { ["Caption"] = "Guests they host", ["CaptionId"] = "hosted-guests-caption" }' />
 }
 
 <h2 class="govuk-heading-m">Visa applications (@Model.Applications.Count)</h2>

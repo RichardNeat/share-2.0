@@ -16,6 +16,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     public DbSet<Guest> Guests => Set<Guest>();
     public DbSet<Person> People => Set<Person>();
     public DbSet<Accommodation> Accommodations => Set<Accommodation>();
+    public DbSet<Case> Cases => Set<Case>();
     public DbSet<IngestRun> IngestRuns => Set<IngestRun>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
 
@@ -23,7 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     {
         // Every scoped entity is filtered by the same council, so a required end (a guest's
         // application, say) is never filtered out for a row that passes its own filter.
-        // A case's council comes from the accommodation address, which is the application's council.
+        // An application's council is the accommodation address's, the same as its case's.
         b.Entity<VisaApplication>().HasQueryFilter(a => CouncilScope == null || a.Council == CouncilScope);
         b.Entity<Guest>().HasQueryFilter(g => CouncilScope == null || g.VisaApplication!.Council == CouncilScope);
         b.Entity<Accommodation>().HasQueryFilter(x => CouncilScope == null || x.Council == CouncilScope);
@@ -31,8 +32,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
         b.Entity<Person>().HasQueryFilter(p => CouncilScope == null
             || p.SponsoredApplications.Any(a => a.Council == CouncilScope)
             || p.HostedApplications.Any(a => a.Council == CouncilScope));
+        b.Entity<Case>().HasQueryFilter(c => CouncilScope == null || c.Council == CouncilScope);
         b.Entity<TimelineEvent>().HasQueryFilter(e => CouncilScope == null
-            || e.VisaApplicationId == null || e.VisaApplication!.Council == CouncilScope);
+            || ((e.VisaApplicationId == null || e.VisaApplication!.Council == CouncilScope)
+                && (e.CaseId == null || e.Case!.Council == CouncilScope)));
 
         b.Entity<VisaApplication>(e =>
         {
@@ -49,5 +52,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
         b.Entity<IngestRun>().HasIndex(r => r.FileName).IsUnique();
         b.Entity<Person>().HasIndex(x => x.MatchKey).IsUnique();
         b.Entity<Accommodation>().HasIndex(x => x.MatchKey).IsUnique();
+        b.Entity<Case>(e =>
+        {
+            e.HasIndex(c => c.MatchKey).IsUnique();
+            e.Ignore(c => c.Guests);
+        });
     }
 }

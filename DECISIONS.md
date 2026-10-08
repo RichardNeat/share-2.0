@@ -114,24 +114,85 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** This milestone's migration drops and recreates the people table. Running the console commands first means they can always recover an old local `app.db`, instead of failing on a migration that conflicts with stale data
 
+## 2026-10-08 · M3 Build the case
+
+### 22. A case groups applications with the same sponsor (by email) and the same accommodation (by address and council)
+
+- **Why:** The brief's rule, applied with the identifiers we chose in M2, so we still never match on names
+- **What:** If an application is missing its sponsor or its accommodation, it gets a case of its own. Without both, we can't know who else belongs with it, and we won't guess. In file 01, Clare Osborne's two applications form one case and the other six stand alone: 7 cases from 8 applications
+- **What:** The case's council comes from the accommodation (falling back to the application's "Local authority of UK address", which is the same answer)
+
+### 23. Case reference `AR-` plus a number, and a title made from the households' family names
+
+- **Why:** References must be the same on every reseed, and caseworkers think in households. The number comes from ingest order on an empty database
+- **What:** "Melnyk household", or "Kovalenko and Lysenko households" when two families share a case, listed in the order they applied
+
+### 24. Case status reads "Checks required" until M4
+
+- **Why:** The ticket asks for a status now. M4's rule gives "Checks required" for a case with no passing or failed checks, so this is the true value, not a placeholder that will change meaning
+- **What:** All five case statuses have one wording and one tag colour each, ready for M4
+
+### 25. "Today" is pinned to 2026-10-08 in `appsettings.json`
+
+- **Why:** Ages (the youngest guest now, the Enhanced DBS rule in M4) must come out the same in every demo run. Tests pin 2026-10-01. Change `Clock:Today` to move it, or remove it to use the real date
+- **What:** Ages are in whole years. Someone born on 29 February has their birthday on 1 March in other years, as UK law treats it, which also errs towards "under 18". A unit test caught .NET's default of 28 February
+
+### 26. Ingest records a "Case formed" event for each new case
+
+- **Why:** It feeds the "What just happened" page now (with links to the new cases) and the case timeline in M5. "Application received" events now carry their case too
+
+### 27. Say "case" only, never "accommodation request" (replaces the `AR-` prefix in decision 23)
+
+- **Why:** The team wants one term. The brief uses "accommodation request" as a synonym for case, which is where the `AR-` prefix and a sentence on the Cases page came from
+- **What:** References are now `CASE-0003`. The Cases page sentence and a code comment no longer mention accommodation requests. CLAUDE.md has a new Terminology section so the term doesn't come back
+
+## 2026-10-08 · GDS and accessibility review (after M3)
+
+### 28. Audit every page with axe-core in headless Chrome, at desktop and phone width
+
+- **Why:** The team asked for a full check of GDS styling and accessibility. Our journey tests cover structure (title, one h1, skip link, labels) but not colour contrast, ARIA or layout at phone width
+- **What:** `tools/a11y-audit.mjs` drives headless Chrome over the DevTools protocol (no Playwright, no installs), runs axe-core for WCAG 2.2 AA plus best practice, and checks for sideways scrolling at 1280px and 390px. CLAUDE.md now says to run it before each milestone commit
+- **Result:** 16 pages at 2 widths, no WCAG violations and no sideways scrolling
+
+### 29. Accept axe's `region` best-practice note on the phase banner and back links
+
+- **Why:** GOV.UK Design System guidance places both before `<main>`. GDS guidance wins over a best-practice rule. It is listed as a known issue in the accessibility statement
+
+### 30. Fixes from the review
+
+- **Focus contrast:** when "The Share" header link had keyboard focus, the tagline stayed light grey on the yellow focus background. It now turns black like the rest of the link. axe can't catch this because it doesn't apply focus; screenshots of tabbing through the page did
+- **Table regions:** every scrollable table box was labelled "Scrollable table", so two on one page were indistinguishable. Each is now labelled by its own table caption. A table box is a keyboard stop only when it actually scrolls (decided in the browser, updated on resize), so desktop users don't tab through empty stops. Its focus ring gains a black inner edge so it shows on white
+- **Right component:** "There are no more files to process" used the error summary, which GOV.UK reserves for form validation. It is now an "Important" notification banner
+- **Right class:** the reference line under each case title used `govuk-hint`, a form-only class. It now uses a small `app-secondary-text` class in GOV.UK's secondary text colour
+
+### 31. Add an accessibility statement, linked from the footer
+
+- **Why:** Every GOV.UK service has one, and the scoring criteria reward a true sentence about accessibility
+- **What:** It claims only what we have done and tested, says plainly that no specialist audit or assistive technology testing has happened, and lists the known issue
+
 ## 2026-10-08 · M6 Who sees what
 
-### 22. Three demo users, chosen on the demo controls page and remembered in a cookie
+### 32. Three demo users, chosen on the demo controls page and remembered in a cookie
 
 - **Why:** The brief rules out real authentication. A "User type" choice on the demo controls page is one click during the demo, and a cookie keeps it across pages without any sign-in machinery
 - **What:** Central admin (sees everything), Birmingham council user and Exeter council user. With no cookie, and for console commands and seeding, the user is the central admin, so nothing changes for anyone who never switches. Every page shows who you are signed in as, with a tag for the council and a "Change user" link back to the demo controls
 - **Turned down:** a login screen, and a user picker in the header, which would crowd it. We also did not hide the demo controls from council users: anyone must be able to drive the demo
 
-### 23. Row-level scoping is done once, as EF Core global query filters on the database context
+### 33. Row-level scoping is done once, as EF Core global query filters on the database context
 
 - **Why:** The brief says scoping runs through every list, detail page and search. Filtering in each page would be easy to forget on the next page we add. A global filter means every query is scoped, including counts on the home page, related records on detail pages, and searches when we build them
-- **What:** An application, its guests and its timeline events belong to the application's council (the accommodation address, as cases will in M3). An accommodation belongs to its own council. A sponsor or host belongs to every council they have an application in, and their page lists only the applications in yours. A record with no council is seen by the central admin only
+- **What:** An application, its guests and its timeline events belong to the application's council (the accommodation address, the same council as their case). An accommodation belongs to its own council. A sponsor or host belongs to every council they have an application in, and their page lists only the applications in yours. A record with no council is seen by the central admin only
 - **Turned down:** a `Where` on each page, and a separate council column on guests and people, which would copy data we already hold
 
-### 24. Another council's record is "Page not found", not "Forbidden"
+### 34. Another council's record is "Page not found", not "Forbidden"
 
 - **Why:** Saying "you can't see this" confirms the record exists. Because of the filters, the record simply isn't found, and the page returns 404 with a GOV.UK "Page not found" page that points to the demo controls to change user
 
-### 25. Ingest ignores the scoping; the ingest summary is scoped
+### 35. Ingest ignores the scoping; the ingest summary is scoped
 
 - **Why:** Matching sponsors, accommodations and repeat submissions must see every council's records, or a council user clicking "Process next file" would create duplicates. The "What changed" list on the ingest page only links to records you can open, with a note saying so; the counts cover the whole file
+
+### 36. Cases are scoped by their own council (after merging M3)
+
+- **Why:** M3 landed on main while M6 was on its branch. A case carries its council (from the accommodation), so it gets the same filter as everything else, and the Cases list, case pages and the home page count are scoped with no page changes
+- **What:** A "Case formed" event is seen only by the case's council, as "Application received" events are by the application's. Ingest also reads cases with the filters off, so a council user processing a file never creates a duplicate case

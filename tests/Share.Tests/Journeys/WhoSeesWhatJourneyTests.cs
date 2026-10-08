@@ -42,7 +42,7 @@ public class WhoSeesWhatJourneyTests : IClassFixture<AppFactory>
         Assert.Contains("You are now signed in as Birmingham council user", Text(switched.QuerySelector(".govuk-notification-banner")));
         Assert.NotNull(switched.QuerySelector("#user-birmingham[checked]"));
 
-        foreach (var url in new[] { "/", "/Applications", "/Guests", "/Sponsors", "/Hosts", "/Accommodations", "/Admin" })
+        foreach (var url in new[] { "/", "/Cases", "/Applications", "/Guests", "/Sponsors", "/Hosts", "/Accommodations", "/Admin" })
         {
             var page = await client.GetPageAsync(url);
             Html.AssertAccessible(page);
@@ -57,6 +57,7 @@ public class WhoSeesWhatJourneyTests : IClassFixture<AppFactory>
 
         var admin = await ClientAsync("admin");
         Assert.Equal(8, (await HrefsAsync(admin, "/Applications", "/Applications/")).Length);
+        Assert.Equal(7, (await HrefsAsync(admin, "/Cases", "/Cases/")).Length);
         Assert.Equal(12, (await HrefsAsync(admin, "/Guests", "/Guests/")).Length);
         Assert.Equal(7, (await HrefsAsync(admin, "/Accommodations", "/Accommodations/")).Length);
 
@@ -65,6 +66,7 @@ public class WhoSeesWhatJourneyTests : IClassFixture<AppFactory>
         Assert.Equal(4, apps.QuerySelectorAll("tbody tr").Length);
         Assert.All(apps.QuerySelectorAll("tbody tr"), r => Assert.Contains("Birmingham", Text(r)));
         Assert.Equal(6, (await HrefsAsync(birmingham, "/Guests", "/Guests/")).Length);
+        Assert.Equal(4, (await HrefsAsync(birmingham, "/Cases", "/Cases/")).Length);
         Assert.Equal(4, (await HrefsAsync(birmingham, "/Sponsors", "/People/")).Length);
         var accommodations = await birmingham.GetPageAsync("/Accommodations");
         Assert.Equal(4, accommodations.QuerySelectorAll("tbody tr").Length);
@@ -73,12 +75,15 @@ public class WhoSeesWhatJourneyTests : IClassFixture<AppFactory>
         var exeter = await ClientAsync("exeter");
         Assert.Equal(4, (await HrefsAsync(exeter, "/Applications", "/Applications/")).Length);
         Assert.Equal(6, (await HrefsAsync(exeter, "/Guests", "/Guests/")).Length);
+        // Clare Osborne's two applications share one case.
+        Assert.Equal(3, (await HrefsAsync(exeter, "/Cases", "/Cases/")).Length);
         Assert.Equal(3, (await HrefsAsync(exeter, "/Sponsors", "/People/")).Length);
         Assert.Contains("Daniel Park", Text((await exeter.GetPageAsync("/Hosts")).QuerySelector("tbody")));
         Assert.DoesNotContain("Daniel Park", Text((await birmingham.GetPageAsync("/Hosts")).QuerySelector("tbody")));
     }
 
     [Theory]
+    [InlineData("/Cases", "/Cases/")]
     [InlineData("/Applications", "/Applications/")]
     [InlineData("/Guests", "/Guests/")]
     [InlineData("/Sponsors", "/People/")]
@@ -131,10 +136,12 @@ public class WhoSeesWhatJourneyTests : IClassFixture<AppFactory>
         var result = await client.SubmitAsync(admin, "form[action*='ProcessNext']");
         Html.AssertAccessible(result);
         Assert.Equal(4, result.QuerySelectorAll("main ul.govuk-list li a[href^='/Applications/']").Length);
+        Assert.Equal(4, result.QuerySelectorAll("main ul.govuk-list li a[href^='/Cases/']").Select(a => a.GetAttribute("href")).Distinct().Count());
         Assert.Contains("only changes to Birmingham records are listed", Text(result.QuerySelector(".govuk-inset-text")));
 
         // Ingest matched against every council's records, not just Birmingham's.
         Assert.Equal(8, (await HrefsAsync(await ClientAsync("admin"), "/Applications", "/Applications/")).Length);
+        Assert.Equal(7, (await HrefsAsync(await ClientAsync("admin"), "/Cases", "/Cases/")).Length);
         Assert.Equal(7, (await HrefsAsync(await ClientAsync("admin"), "/Accommodations", "/Accommodations/")).Length);
     }
 }
