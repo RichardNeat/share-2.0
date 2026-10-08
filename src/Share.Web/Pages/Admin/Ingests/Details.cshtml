@@ -21,6 +21,10 @@
 </dl>
 
 <h2 class="govuk-heading-m">What changed</h2>
+@if (!Model.SignedInAs.IsAdmin)
+{
+    <div class="govuk-inset-text">You are signed in as @Model.SignedInAs.Name, so only changes to @Display.Council(Model.SignedInAs.Council) records are listed. The counts above cover the whole file.</div>
+}
 @if (Model.Events.Count == 0)
 {
     <p class="govuk-body">Nothing changed.</p>

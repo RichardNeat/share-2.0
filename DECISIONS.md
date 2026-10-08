@@ -113,3 +113,25 @@ A running timeline of the major decisions made while building this service, olde
 ### 21. Console `reset` and `seed` run before the startup migration
 
 - **Why:** This milestone's migration drops and recreates the people table. Running the console commands first means they can always recover an old local `app.db`, instead of failing on a migration that conflicts with stale data
+
+## 2026-10-08 · M6 Who sees what
+
+### 22. Three demo users, chosen on the demo controls page and remembered in a cookie
+
+- **Why:** The brief rules out real authentication. A "User type" choice on the demo controls page is one click during the demo, and a cookie keeps it across pages without any sign-in machinery
+- **What:** Central admin (sees everything), Birmingham council user and Exeter council user. With no cookie, and for console commands and seeding, the user is the central admin, so nothing changes for anyone who never switches. Every page shows who you are signed in as, with a tag for the council and a "Change user" link back to the demo controls
+- **Turned down:** a login screen, and a user picker in the header, which would crowd it. We also did not hide the demo controls from council users: anyone must be able to drive the demo
+
+### 23. Row-level scoping is done once, as EF Core global query filters on the database context
+
+- **Why:** The brief says scoping runs through every list, detail page and search. Filtering in each page would be easy to forget on the next page we add. A global filter means every query is scoped, including counts on the home page, related records on detail pages, and searches when we build them
+- **What:** An application, its guests and its timeline events belong to the application's council (the accommodation address, as cases will in M3). An accommodation belongs to its own council. A sponsor or host belongs to every council they have an application in, and their page lists only the applications in yours. A record with no council is seen by the central admin only
+- **Turned down:** a `Where` on each page, and a separate council column on guests and people, which would copy data we already hold
+
+### 24. Another council's record is "Page not found", not "Forbidden"
+
+- **Why:** Saying "you can't see this" confirms the record exists. Because of the filters, the record simply isn't found, and the page returns 404 with a GOV.UK "Page not found" page that points to the demo controls to change user
+
+### 25. Ingest ignores the scoping; the ingest summary is scoped
+
+- **Why:** Matching sponsors, accommodations and repeat submissions must see every council's records, or a council user clicking "Process next file" would create duplicates. The "What changed" list on the ingest page only links to records you can open, with a note saying so; the counts cover the whole file
