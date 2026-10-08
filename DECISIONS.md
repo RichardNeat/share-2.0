@@ -372,7 +372,3 @@ A running timeline of the major decisions made while building this service, olde
 ### 64. The test form helper now sends only checked radios and checkboxes
 
 - **Why:** It sent every radio's value, so a "nothing chosen" test actually sent a choice. Earlier tests always set radio values explicitly, so they never noticed
-
-### 65. Two one-off test failures and a slow run were caused by a Wi-Fi drop, not the code
-
-- **What:** The council-scoping check test (M6) failed twice, and a full run took nearly two minutes instead of five seconds. Both happened while the developer's Wi-Fi was down. The suite then passed in more than 30 runs in a row in about five seconds. No code change; noted so nobody chases it
