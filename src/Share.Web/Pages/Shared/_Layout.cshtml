@@ -5,6 +5,7 @@
     bool Active(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
     var random = new Random();
     var hasBlueBackground = random.Next(10) == 0;
+    var isFlipped = random.Next(20) == 0;
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
@@ -16,7 +17,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="govuk-template__body @(hasBlueBackground ? "app-blue-background" : "")">
+<body class="govuk-template__body @(hasBlueBackground ? "app-blue-background" : "") @(isFlipped ? "app-flipped" : "")">
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
     <header class="govuk-header govuk-header--full-width-border app-header">

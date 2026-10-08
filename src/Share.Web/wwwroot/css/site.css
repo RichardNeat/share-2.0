@@ -38,3 +38,6 @@
 
 /* Random blue background (1 in 10 chance) */
 .app-blue-background { background-color: #0087dc; }
+
+/* Random page flip (1 in 20 chance) */
+.app-flipped { transform: rotate(180deg); }
