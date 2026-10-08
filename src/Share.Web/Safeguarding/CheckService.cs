@@ -16,6 +16,27 @@ public class CheckService(AppDbContext db, TimeProvider clock)
             .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == id);
 
+    // Records that the guests have arrived, which unlocks check 4.
+    public async Task<string?> RecordArrivalAsync(Case c, string? day, string? month, string? year)
+    {
+        var (date, error) = SafeguardingRules.ValidateArrivalDate(day, month, year, Ages.Today(clock));
+        if (error is not null) return error;
+        var now = clock.GetUtcNow().UtcDateTime;
+        var changed = c.ArrivalRecordedOn is not null;
+        c.ArrivalRecordedOn = date;
+        c.ArrivalRecordedAt = now;
+        db.TimelineEvents.Add(new TimelineEvent
+        {
+            Kind = TimelineEventKind.GuestsArrived,
+            OccurredAt = now,
+            Title = changed ? "Arrival date changed" : "Guests arrived",
+            Description = $"A caseworker recorded that the guests arrived at the accommodation on {Display.Date(date)}",
+            CaseId = c.Id,
+        });
+        await db.SaveChangesAsync();
+        return null;
+    }
+
     // Records a check update and logs it (and any change of case status) for the timeline.
     public async Task<List<SafeguardingRules.ValidationError>> UpdateAsync(Case c, CheckKind kind, CheckStatus? status, string? reason, DbsType? dbs)
     {

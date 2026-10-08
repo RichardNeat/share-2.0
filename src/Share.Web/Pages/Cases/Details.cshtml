@@ -77,13 +77,13 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     @foreach (var check in Model.Assessment.Checks)
     {
-        <div class="govuk-summary-list__row @(check.Locked ? "govuk-summary-list__row--no-actions" : "")">
+        <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@((int)check.Kind). @Display.CheckName(check.Kind)</dt>
             <dd class="govuk-summary-list__value">
                 @if (check.Locked)
                 {
                     <partial name="_CheckStatusTag" model="check.Recorded" />
-                    <p class="govuk-body-s app-secondary-text">Available when guests arrive</p>
+                    <p class="govuk-body-s app-secondary-text">Available when guests arrive. Record the arrival to complete this check.</p>
                 }
                 else
                 {
@@ -100,14 +100,32 @@
                     {
                         <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0"><strong>@note</strong></p>
                     }
+                    @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is { } arrived)
+                    {
+                        <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Guests arrived on @Display.Date(arrived) (recorded by a caseworker)</p>
+                    }
                 }
             </dd>
-            @if (!check.Locked)
-            {
-                <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update<span class="govuk-visually-hidden"> @Display.CheckName(check.Kind).ToLowerInvariant()</span></a>
-                </dd>
-            }
+            <dd class="govuk-summary-list__actions">
+                @if (check.Locked)
+                {
+                    <a class="govuk-link" href="/Cases/@c.Id/Arrival">Record arrival<span class="govuk-visually-hidden"> of the guests</span></a>
+                }
+                else
+                {
+                    <ul class="govuk-summary-list__actions-list">
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" href="/Cases/@c.Id/Checks/@((int)check.Kind)">Update<span class="govuk-visually-hidden"> @Display.CheckName(check.Kind).ToLowerInvariant()</span></a>
+                        </li>
+                        @if (check.Kind == CheckKind.GuestsArrived && c.ArrivalRecordedOn is not null)
+                        {
+                            <li class="govuk-summary-list__actions-list-item">
+                                <a class="govuk-link" href="/Cases/@c.Id/Arrival">Change arrival date</a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </dd>
         </div>
     }
 </dl>

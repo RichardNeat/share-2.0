@@ -1,0 +1,67 @@
+@page "/Cases/{id:int}/Arrival"
+@model Share.Web.Pages.Cases.ArrivalModel
+@{
+    ViewData["Title"] = (Model.Error is null ? "" : "Error: ") + $"When did the guests arrive? – case {Model.Case.Reference}";
+    var err = Model.Error;
+    // Highlight the part the error is about (all three when the whole date is wrong).
+    bool Bad(string part) => err is not null && (!err.Contains("must include") || err.Contains(part));
+}
+@section BeforeContent {
+    <a href="/Cases/@Model.Case.Id" class="govuk-back-link">Back to case</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @if (err is not null)
+        {
+            <div class="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <ul class="govuk-list govuk-error-summary__list">
+                            <li><a href="#@(Bad("day") ? "Day" : Bad("month") ? "Month" : "Year")">@err</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+        <form method="post" novalidate>
+            <div class="govuk-form-group @(err is null ? "" : "govuk-form-group--error")">
+                <fieldset class="govuk-fieldset" role="group" aria-describedby="arrival-hint@(err is null ? "" : " arrival-error")">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <span class="govuk-caption-l">Case @Model.Case.Reference · @Model.Case.Title</span>
+                        <h1 class="govuk-fieldset__heading">When did the guests arrive at the accommodation?</h1>
+                    </legend>
+                    <div id="arrival-hint" class="govuk-hint">For example, 26 2 2026. Recording the arrival lets you complete check 4.</div>
+                    @if (err is not null)
+                    {
+                        <p id="arrival-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> @err</p>
+                    }
+                    <div class="govuk-date-input">
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="Day">Day</label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(Bad("day") ? "govuk-input--error" : "")" id="Day" name="Day" type="text" inputmode="numeric" value="@Model.Day" />
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="Month">Month</label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(Bad("month") ? "govuk-input--error" : "")" id="Month" name="Month" type="text" inputmode="numeric" value="@Model.Month" />
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="Year">Year</label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(Bad("year") ? "govuk-input--error" : "")" id="Year" name="Year" type="text" inputmode="numeric" value="@Model.Year" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button">Record arrival</button>
+                <a class="govuk-link" href="/Cases/@Model.Case.Id">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

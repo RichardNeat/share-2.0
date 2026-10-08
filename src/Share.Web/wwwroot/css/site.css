@@ -34,3 +34,6 @@
 /* Who you are signed in as, on every page */
 .app-signed-in { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 0; }
 .app-signed-in__change { margin-left: auto; }
+
+/* Random blue background (1 in 10 chance) */
+.app-blue-background { background-color: #0087dc; }

@@ -115,6 +115,33 @@ public class SafeguardingRulesTests
     }
 
     [Fact]
+    public void A_caseworker_recording_an_arrival_unlocks_check_4()
+    {
+        var c = CaseWith(new Guest { Position = 1 });
+        c.ArrivalRecordedOn = new DateOnly(2026, 2, 26);
+        Assert.False(SafeguardingRules.Assess(c, Today).Checks.Single(x => x.Kind == GuestsArrived).Locked);
+    }
+
+    [Theory]
+    [InlineData("26", "2", "2026", "2026-02-26", null)]
+    [InlineData(" 1 ", "10", "2026", "2026-10-01", null)]          // today is allowed
+    [InlineData("", "", "", null, "Enter the date the guests arrived")]
+    [InlineData("", "2", "2026", null, "Date the guests arrived must include a day")]
+    [InlineData("26", "", "2026", null, "Date the guests arrived must include a month")]
+    [InlineData("26", "2", "", null, "Date the guests arrived must include a year")]
+    [InlineData("29", "2", "2026", null, "Date the guests arrived must be a real date")]
+    [InlineData("1", "13", "2026", null, "Date the guests arrived must be a real date")]
+    [InlineData("1", "2", "26", null, "Date the guests arrived must be a real date")]
+    [InlineData("x", "2", "2026", null, "Date the guests arrived must be a real date")]
+    [InlineData("2", "10", "2026", null, "Date the guests arrived must be today or in the past")]
+    public void Arrival_date_follows_the_gov_uk_date_input_rules(string day, string month, string year, string? expected, string? error)
+    {
+        var (date, message) = SafeguardingRules.ValidateArrivalDate(day, month, year, Today);
+        Assert.Equal(expected, date?.ToString("yyyy-MM-dd"));
+        Assert.Equal(error, message);
+    }
+
+    [Fact]
     public void Validation_requires_a_status() =>
         Assert.Equal("Status", Assert.Single(SafeguardingRules.Validate(AccommodationExists, null, null, null, false, false)).Field);
 
