@@ -240,3 +240,10 @@ A running timeline of the major decisions made while building this service, olde
 
 - **Why:** A check has no council of its own. Checks are only ever loaded with their case, which is filtered, so viewing or updating a check on another council's case is "Page not found". "Check updated" and "Case status changed" events carry the case, so the event filter scopes them too
 - **Turned down:** a separate filter on checks, which would repeat the case's council for no gain
+
+## 2026-10-08 · Merging M6 into main
+
+### 45. Regenerate the model snapshot after M21 and M24 merged without it
+
+- **Why:** The notifications (M21) and announcements (M24) pull requests each added a migration but not the matching model snapshot change. EF then reported "pending model changes" at startup and every journey test failed, on main as well as here
+- **What:** The snapshot now includes both tables. No new migration: the M21 and M24 migrations already create exactly those tables and indexes, so a new one would try to create them twice

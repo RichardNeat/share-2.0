@@ -1,0 +1,94 @@
+@page
+@model IndexModel
+@{ ViewData["Title"] = "Announcements - Admin"; }
+
+<h1 class="govuk-heading-l">Announcements</h1>
+
+<div class="govuk-!-margin-bottom-6">
+    <a href="/Admin/Announcements/Create" class="govuk-button">Create announcement</a>
+</div>
+
+@if (Model.Announcements.Count == 0)
+{
+    <p class="govuk-body">No announcements yet.</p>
+}
+else
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table">
+                <caption class="govuk-table__caption">All announcements</caption>
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Title</th>
+                        <th scope="col" class="govuk-table__header">Status</th>
+                        <th scope="col" class="govuk-table__header">Publish date</th>
+                        <th scope="col" class="govuk-table__header">Created</th>
+                        <th scope="col" class="govuk-table__header">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var announcement in Model.Announcements)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a href="/Admin/Announcements/Edit/@announcement.Id" class="govuk-link">
+                                    @announcement.Title
+                                </a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (announcement.IsHidden)
+                                {
+                                    <span class="govuk-tag govuk-tag--grey">Hidden</span>
+                                }
+                                else if (announcement.PublishAt.HasValue && announcement.PublishAt > DateTime.UtcNow)
+                                {
+                                    <span class="govuk-tag govuk-tag--blue">Scheduled</span>
+                                }
+                                else
+                                {
+                                    <span class="govuk-tag govuk-tag--green">Published</span>
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (announcement.PublishAt.HasValue)
+                                {
+                                    @announcement.PublishAt.Value.ToString("d MMM yyyy HH:mm")
+                                }
+                                else
+                                {
+                                    <em>Immediately</em>
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                @announcement.CreatedAt.ToString("d MMM yyyy")
+                            </td>
+                            <td class="govuk-table__cell">
+                                <div class="govuk-button-group">
+                                    @if (announcement.IsHidden)
+                                    {
+                                        <form method="post" asp-page-handler="Show" style="display: inline;">
+                                            <input type="hidden" name="id" value="@announcement.Id" />
+                                            <button type="submit" class="govuk-button govuk-button--secondary govuk-button--small">Show</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page-handler="Hide" style="display: inline;">
+                                            <input type="hidden" name="id" value="@announcement.Id" />
+                                            <button type="submit" class="govuk-button govuk-button--secondary govuk-button--small">Hide</button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-page-handler="Delete" style="display: inline;">
+                                        <input type="hidden" name="id" value="@announcement.Id" />
+                                        <button type="submit" class="govuk-button govuk-button--warning govuk-button--small">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

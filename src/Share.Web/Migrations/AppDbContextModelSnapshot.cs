@@ -45,6 +45,42 @@ namespace Share.Web.Migrations
                     b.ToTable("Accommodations");
                 });
 
+            modelBuilder.Entity("Share.Web.Models.Announcement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PublishAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("IsHidden", "PublishAt")
+                        .IsDescending(false, true);
+
+                    b.ToTable("Announcements");
+                });
+
             modelBuilder.Entity("Share.Web.Models.ApplicationAnswer", b =>
                 {
                     b.Property<int>("Id")
@@ -218,6 +254,48 @@ namespace Share.Web.Migrations
                         .IsUnique();
 
                     b.ToTable("IngestRuns");
+                });
+
+            modelBuilder.Entity("Share.Web.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RelatedEntityId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RelatedEntityType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("UserId", "IsRead");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Share.Web.Models.Person", b =>
