@@ -25,7 +25,9 @@ public static class Html
     {
         var form = page.QuerySelector<IHtmlFormElement>(formSelector) ?? throw new InvalidOperationException($"No form {formSelector}");
         var fields = new Dictionary<string, string>();
-        foreach (var input in form.QuerySelectorAll<IHtmlInputElement>("input[name]")) fields[input.Name!] = input.Value;
+        // Like a browser: radios and checkboxes are only sent when checked.
+        foreach (var input in form.QuerySelectorAll<IHtmlInputElement>("input[name]"))
+            if (input.Type is not ("radio" or "checkbox") || input.IsChecked) fields[input.Name!] = input.Value;
         foreach (var select in form.QuerySelectorAll<IHtmlSelectElement>("select[name]")) fields[select.Name!] = select.Value;
         foreach (var (k, v) in values ?? []) fields[k] = v;
         var response = await client.PostAsync(form.Action, new FormUrlEncodedContent(fields));

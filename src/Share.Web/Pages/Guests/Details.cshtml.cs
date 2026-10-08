@@ -13,6 +13,7 @@ public class DetailsModel(AppDbContext db) : PageModel
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var guest = await db.Guests
+            .Include(g => g.DuplicateOf)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Sponsor)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Accommodation)
             .Include(g => g.VisaApplication).ThenInclude(a => a!.Host)

@@ -10,6 +10,13 @@
 }
 <span class="govuk-caption-l">Guest</span>
 <h1 class="govuk-heading-l">@g.FullName</h1>
+@if (g.DuplicateOf is { } original)
+{
+    <div class="govuk-inset-text">
+        <strong class="govuk-tag govuk-tag--grey">Duplicate</strong>
+        This record is a duplicate of <a class="govuk-link" href="/Guests/@original.Id">@original.FullName</a>. Use that record instead.
+    </div>
+}
 
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">On the application as</dt><dd class="govuk-summary-list__value">@(g.IsLead ? "Lead applicant" : "Family member")</dd></div>

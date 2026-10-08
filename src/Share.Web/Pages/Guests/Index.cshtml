@@ -25,7 +25,7 @@ else
             {
                 var app = g.VisaApplication!;
                 <tr class="govuk-table__row">
-                    <td class="govuk-table__cell"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a></td>
+                    <td class="govuk-table__cell"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a>@if (g.DuplicateOfGuestId != null) { <br /><strong class="govuk-tag govuk-tag--grey">Duplicate</strong> }</td>
                     <td class="govuk-table__cell">@Display.Date(g.DateOfBirth)</td>
                     <td class="govuk-table__cell"><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a></td>
                     <td class="govuk-table__cell">

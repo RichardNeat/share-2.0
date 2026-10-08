@@ -18,6 +18,11 @@ public class Guest
     public string? Gwf { get; set; }
     public List<ApplicationAnswer> Answers { get; set; } = [];
 
+    // Set when a reviewer accepts a suggested duplicate: this record is the same person as that one.
+    public int? DuplicateOfGuestId { get; set; }
+    public Guest? DuplicateOf { get; set; }
+    public DateTime? MarkedDuplicateAt { get; set; }
+
     public bool IsLead => Position == 1;
     public string FullName => $"{GivenName} {FamilyName}".Trim();
 }

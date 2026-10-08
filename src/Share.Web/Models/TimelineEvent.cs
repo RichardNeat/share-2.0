@@ -10,6 +10,7 @@ public enum TimelineEventKind
     VisaStatusChanged,
     OfferReceived,
     CaseRematched,
+    DuplicateMarked,
 }
 
 public static class TimelineOrder
@@ -24,6 +25,7 @@ public static class TimelineOrder
         TimelineEventKind.CheckUpdated => 4,
         TimelineEventKind.CaseStatusChanged => 6,
         TimelineEventKind.CaseRematched => 5,
+        TimelineEventKind.DuplicateMarked => 4,
         TimelineEventKind.OfferReceived => 0,
         _ => 6,
     };

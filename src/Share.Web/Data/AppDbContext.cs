@@ -21,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
     public DbSet<DecisionUpdate> DecisionUpdates => Set<DecisionUpdate>();
     public DbSet<Offer> Offers => Set<Offer>();
+    public DbSet<DuplicateDismissal> DuplicateDismissals => Set<DuplicateDismissal>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
@@ -56,6 +57,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser us
             e.HasOne(a => a.Host).WithMany(p => p.HostedApplications).HasForeignKey(a => a.HostId);
         });
         b.Entity<Guest>().HasIndex(p => p.Gwf);
+        b.Entity<Guest>().HasOne(g => g.DuplicateOf).WithMany().HasForeignKey(g => g.DuplicateOfGuestId);
+        b.Entity<DuplicateDismissal>().HasIndex(d => d.PairKey).IsUnique();
         b.Entity<Offer>(e =>
         {
             e.HasIndex(o => o.SubmissionReference).IsUnique();

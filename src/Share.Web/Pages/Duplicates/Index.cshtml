@@ -1,0 +1,113 @@
+@page
+@model Share.Web.Pages.Duplicates.IndexModel
+@using Share.Web.Matching
+@{
+    ViewData["Title"] = (Model.ErrorPairKey is null ? "" : "Error: ") + "Suggested duplicates";
+    var errorIndex = Model.Suggestions.ToList().FindIndex(s => s.PairKey == Model.ErrorPairKey);
+    (string Text, string Css) Tag(DuplicateConfidence c) => c switch
+    {
+        DuplicateConfidence.High => ("High confidence", "govuk-tag--red"),
+        DuplicateConfidence.Medium => ("Medium confidence", "govuk-tag--orange"),
+        _ => ("Low confidence", "govuk-tag--grey"),
+    };
+}
+<partial name="_SuccessBanner" model="Model.Message" />
+@if (errorIndex >= 0)
+{
+    <div class="govuk-error-summary">
+        <div role="alert">
+            <h2 class="govuk-error-summary__title">There is a problem</h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list"><li><a href="#keep-@errorIndex">Select which record to keep</a></li></ul>
+            </div>
+        </div>
+    </div>
+}
+<h1 class="govuk-heading-l">Suggested duplicates</h1>
+<p class="govuk-body">Guests who look like the same person, found by comparing passport numbers, names and dates of birth across every application. Names that differ by a letter or two are caught too. Check each pair: keep one record and mark the other as its duplicate, or say they are different people.</p>
+
+@if (Model.Suggestions.Count == 0)
+{
+    <p class="govuk-body govuk-!-margin-bottom-9">There are no suggested duplicates.</p>
+}
+@for (var i = 0; i < Model.Suggestions.Count; i++)
+{
+    var s = Model.Suggestions[i];
+    var (tagText, tagCss) = Tag(s.Confidence);
+    var hasError = i == errorIndex;
+    <section class="app-duplicate govuk-!-margin-bottom-9" aria-labelledby="pair-@i">
+        <h2 class="govuk-heading-m" id="pair-@i">@s.A.FullName and @s.B.FullName</h2>
+        <p class="govuk-body"><strong class="govuk-tag @tagCss">@tagText</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+            @foreach (var reason in s.Reasons) { <li>@reason</li> }
+        </ul>
+        <div class="govuk-grid-row">
+            @foreach (var g in new[] { s.A, s.B })
+            {
+                var app = g.VisaApplication!;
+                <div class="govuk-grid-column-one-half">
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h3 class="govuk-summary-card__title"><a class="govuk-link" href="/Guests/@g.Id">@g.FullName</a></h3>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <dl class="govuk-summary-list">
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Date of birth</dt><dd class="govuk-summary-list__value">@Display.Date(g.DateOfBirth)</dd></div>
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Passport</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.PassportNumber)</dd></div>
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Nationality</dt><dd class="govuk-summary-list__value">@Display.OrNotGiven(g.Nationality)</dd></div>
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Application</dt><dd class="govuk-summary-list__value"><a class="govuk-link" href="/Applications/@app.Id">@app.Uan</a></dd></div>
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Submitted</dt><dd class="govuk-summary-list__value">@Display.DateTime(app.SubmittedAt)</dd></div>
+                                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Case</dt><dd class="govuk-summary-list__value">
+                                    @if (app.Case is { } c) { <a class="govuk-link" href="/Cases/@c.Id">@c.Reference</a> } else { @:Not in a case
+                                    }
+                                </dd></div>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <form method="post" asp-page-handler="Keep" novalidate>
+            <input type="hidden" name="pairKey" value="@s.PairKey" />
+            <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : "")">
+                <fieldset class="govuk-fieldset" @(hasError ? Html.Raw($"aria-describedby=\"keep-error-{i}\"") : null)>
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">If they are the same person, which record should be kept?</legend>
+                    @if (hasError)
+                    {
+                        <p id="keep-error-@i" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> Select which record to keep</p>
+                    }
+                    <div class="govuk-radios govuk-radios--small">
+                        @foreach (var (g, n) in new[] { (s.A, 0), (s.B, 1) })
+                        {
+                            var id = n == 0 ? $"keep-{i}" : $"keep-{i}-b";
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="@id" name="keep" type="radio" value="@g.Id" />
+                                <label class="govuk-label govuk-radios__label" for="@id">Keep @g.FullName (@g.VisaApplication!.Uan)</label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+            <button type="submit" class="govuk-button">Mark the other as a duplicate<span class="govuk-visually-hidden">: @s.A.FullName and @s.B.FullName</span></button>
+        </form>
+        <form method="post" asp-page-handler="Dismiss">
+            <input type="hidden" name="pairKey" value="@s.PairKey" />
+            <button type="submit" class="govuk-button govuk-button--secondary">Not a duplicate<span class="govuk-visually-hidden">: @s.A.FullName and @s.B.FullName</span></button>
+        </form>
+    </section>
+}
+
+<h2 class="govuk-heading-m">Marked as duplicates (@Model.Marked.Count)</h2>
+@if (Model.Marked.Count == 0)
+{
+    <p class="govuk-body">No records have been marked as duplicates yet.</p>
+}
+else
+{
+    <ul class="govuk-list govuk-list--spaced">
+        @foreach (var g in Model.Marked)
+        {
+            <li><a class="govuk-link" href="/Guests/@g.Id">@g.FullName (@g.VisaApplication!.Uan)</a> is a duplicate of <a class="govuk-link" href="/Guests/@g.DuplicateOf!.Id">@g.DuplicateOf.FullName (@g.DuplicateOf.VisaApplication!.Uan)</a></li>
+        }
+    </ul>
+}

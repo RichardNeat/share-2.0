@@ -353,3 +353,26 @@ A running timeline of the major decisions made while building this service, olde
 ### 61. Cases grow as later files add families to the same sponsor and address
 
 - **Seen in the data:** by file 08 the Melnyk case becomes "Melnyk and Romanyuk households", and a third family joins in file 19. Tests now find cases by the start of their title rather than an exact one, and rematch tests assert the best-ranked offer rather than a fixed address
+
+## 2026-10-08 · M14 Suggested duplicates ★
+
+### 62. Duplicate guests are suggested by five rules, ranked by confidence
+
+- **What:** High: same passport number, or same name and date of birth. Medium: names 1 or 2 letters apart (Levenshtein distance) with the same date of birth, or passport numbers 1 character apart. Low: same family name and given names at most 1 letter apart, but different dates of birth. Each suggestion lists every reason in words. Pairs rank by their best confidence, then by a score summing all reasons
+- **What:** Names are compared after normalising (case, accents, apostrophes, hyphens and spacing), so only real spelling differences count. Family members on the same application are never paired. Levenshtein is a small pure function with unit tests for inserts, deletes, substitutions and transliteration
+- **In the data:** we searched all 59 guests by eye and by script. There are two real pairs, both arriving in file 05: Olena Kovalenko and Olena Kovalenco (same passport, one letter apart) and two Dmytro Shevchenko records (passports one character apart). The rules find both and nothing else. A looser search turned up only unrelated people
+- **Turned down:** grouping candidates before comparing. With 59 guests, comparing every pair is instant and simpler
+
+### 63. "Not a duplicate" is remembered against a stable pair key; accepting marks one record as the duplicate of the other
+
+- **What:** The pair key is each guest's application UAN and position on it, so a dismissed pair stays dismissed as more files arrive (tested by ingesting file 06 after dismissing). A reset clears dismissals, as planned in CLAUDE.md
+- **What:** To accept, the reviewer chooses which record to keep (GOV.UK radios, with an error if none is chosen). The other guest gets "Duplicate of", shown as a tag on the guests list and an inset on its page linking to the kept record, and both cases' timelines record it. We did not build M13's full merge
+- **Scoping:** a council sees only pairs within its own council; central admin sees all
+
+### 64. The test form helper now sends only checked radios and checkboxes
+
+- **Why:** It sent every radio's value, so a "nothing chosen" test actually sent a choice. Earlier tests always set radio values explicitly, so they never noticed
+
+### 65. Two one-off test failures and a slow run were caused by a Wi-Fi drop, not the code
+
+- **What:** The council-scoping check test (M6) failed twice, and a full run took nearly two minutes instead of five seconds. Both happened while the developer's Wi-Fi was down. The suite then passed in more than 30 runs in a row in about five seconds. No code change; noted so nobody chases it
