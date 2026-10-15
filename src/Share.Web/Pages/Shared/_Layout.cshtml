@@ -3,8 +3,15 @@
     var signedInAs = CurrentUser.User;
     var path = Context.Request.Path.Value ?? "/";
     bool Active(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-    var hasBlueBackground = Context.Session.GetString("blueBackground") == "true";
-    var isFlipped = Context.Session.GetString("isFlipped") == "true";
+    var isFlippedToggled = Context.Session.GetString("isFlipped") == "true";
+    var isBlueBackgroundToggled = Context.Session.GetString("blueBackground") == "true";
+
+    var requestCount = (int?)Context.Session.GetInt32("requestCount") ?? 0;
+    requestCount++;
+    Context.Session.SetInt32("requestCount", requestCount);
+
+    var shouldFlip = isFlippedToggled || requestCount % 10 == 0;
+    var shouldHaveBlueBackground = isBlueBackgroundToggled || requestCount % 7 == 0;
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
@@ -16,7 +23,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/govuk-frontend@5/dist/govuk/govuk-frontend.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="govuk-template__body @(hasBlueBackground ? "app-blue-background" : "") @(isFlipped ? "app-flipped" : "")">
+<body class="govuk-template__body @(shouldHaveBlueBackground ? "app-blue-background" : "") @(shouldFlip ? "app-flipped" : "")">
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
     <header class="govuk-header govuk-header--full-width-border app-header">
